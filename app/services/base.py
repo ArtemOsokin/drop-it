@@ -1,0 +1,2 @@
+class BaseServiceDB:
+    pass
