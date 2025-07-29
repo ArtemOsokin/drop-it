@@ -8,22 +8,22 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=30)
     email: EmailStr
-    name: Optional[str] = Field(None, max_length=30)
-    surname: Optional[str] = Field(None, max_length=30)
+    first_name: Optional[str] = Field(None, max_length=30)
+    last_name: Optional[str] = Field(None, max_length=30)
     is_artist: bool = False
     birthday: Optional[datetime] = None
     avatar_url: Optional[str] = Field(None, max_length=512)
 
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=6, max_length=100)
+    hashed_password: str = Field(..., min_length=6, max_length=100, alias="password")
 
 
 class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=30)
     email: Optional[EmailStr] = None
-    name: Optional[str] = Field(None, max_length=30)
-    surname: Optional[str] = Field(None, max_length=30)
+    first_name: Optional[str] = Field(None, max_length=30)
+    last_name: Optional[str] = Field(None, max_length=30)
     is_artist: Optional[bool] = None
     birthday: Optional[datetime] = None
     avatar_url: Optional[str] = Field(None, max_length=512)

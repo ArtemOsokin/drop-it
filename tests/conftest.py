@@ -10,6 +10,7 @@ from sqlalchemy_utils import create_database, database_exists, drop_database
 from app.core.config import settings
 from app.db import models
 from app.db.base import Base
+from app.db.models import User
 from tests.factory import UserFactory
 
 
@@ -70,3 +71,16 @@ def created_user(user_creator) -> models.User:
 @pytest.fixture
 def fake_uuid():
     return uuid.uuid4()
+
+@pytest.fixture
+def fake_user_data(faker):
+    """Генерация данных пользователя через Faker"""
+    return {
+        "email": faker.unique.email(),
+        "username": faker.unique.user_name(),
+        "first_name": faker.first_name(),
+        "last_name": faker.last_name(),
+        "birthday": faker.date_of_birth(minimum_age=18, maximum_age=70).isoformat(),
+        "avatar_url": faker.image_url(),
+        "password": faker.password(length=12, special_chars=True, digits=True),
+    }

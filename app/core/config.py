@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = 'postgres'
     POSTGRES_DB: str = 'postgres'
 
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    SECRET_KEY: str = "your-super-secret-key"
+    ALGORITHM: str = "HS256"
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:   # pylint: disable=C0103
         return MultiHostUrl.build(
