@@ -14,8 +14,8 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
 
     username = factory.LazyAttribute(lambda _: faker.unique.user_name())
     email = factory.LazyAttribute(lambda _: faker.unique.email())
-    name = factory.LazyAttribute(lambda _: faker.first_name())
-    surname = factory.LazyAttribute(lambda _: faker.last_name())
+    first_name = factory.LazyAttribute(lambda _: faker.first_name())
+    last_name = factory.LazyAttribute(lambda _: faker.last_name())
     hashed_password = factory.LazyAttribute(lambda _: "$2b$12$mockedhashedpassword")
     is_artist = factory.LazyAttribute(lambda _: faker.boolean())
     birthday = factory.LazyAttribute(lambda _: faker.date_of_birth(minimum_age=18, maximum_age=30))

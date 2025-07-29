@@ -1,10 +1,7 @@
-from unittest.mock import AsyncMock
-
 import pytest
 
-from app.repositories.user import UserRepository
-
+from app.schemas.users import UserCreate
 
 @pytest.fixture
-def mock_user_repo_get_user_by_id(mocker):
-    return mocker.patch.object(UserRepository, 'get_user_by_id', AsyncMock())
+def fake_user_create(fake_user_data):
+    return UserCreate(**fake_user_data)
