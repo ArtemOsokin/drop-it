@@ -1,2 +1,2 @@
-class BaseServiceDB:
+class BaseService:
     pass

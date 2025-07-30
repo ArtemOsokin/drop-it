@@ -1,20 +1,26 @@
+from sqlalchemy import select
+
 from app.db.models import User
 from app.repositories.base import BaseRepository
 
 
 class UserRepository(BaseRepository):
 
-    def get_user_by_id(self, user_id: int):
-        return self.db.query(User).filter(User.id == user_id).first()
+    async def get_user_by_id(self, user_id: int) -> User | None:
+        result = await self.db.execute(select(User).where(User.id == user_id))
+        return result.scalar_one_or_none()
 
-    def get_user_by_username(self, username: str):
-        return self.db.query(User).filter(User.username == username).first()
 
-    def get_user_by_email(self, email: str):
-        return self.db.query(User).filter(User.email == email).first()
+    async def get_user_by_username(self, username: str) -> User | None:
+        result = await self.db.execute(select(User).where(User.username == username))
+        return result.scalar_one_or_none()
 
-    def create_user(self, user: User):
+    async def get_user_by_email(self, email: str) -> User | None:
+        result = await  self.db.execute(select(User).where(User.email == email))
+        return result.scalar_one_or_none()
+
+    async def create_user(self, user: User):
         self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
+        await self.db.commit()
+        await self.db.refresh(user)
         return user

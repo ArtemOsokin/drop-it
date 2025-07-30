@@ -1,17 +1,22 @@
 import pytest
-from fastapi.testclient import TestClient
+import pytest_asyncio
 
-from app.db.engine import get_db
+from httpx import AsyncClient
+
+from app.db.engine import get_async_session
 from main import app
 
 
-@pytest.fixture(scope="function")
-def client(session):
-    def override_get_db():
-        try:
-            yield session
-        finally:
-            pass
+@pytest_asyncio.fixture(scope="function")
+async def client(async_session):
+    if hasattr(async_session, "__anext__"):
+        raise ValueError('Not Acync session')
+    async def override_get_session():
+        yield async_session
 
-    app.dependency_overrides[get_db] = override_get_db
-    return TestClient(app)
+    app.dependency_overrides[get_async_session] = override_get_session
+
+    async with AsyncClient() as c:
+        yield c
+
+    app.dependency_overrides.clear()

@@ -1,80 +1,95 @@
 # pylint: disable=redefined-outer-name
-import subprocess
+import asyncio
 import uuid
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy_utils import create_database, database_exists, drop_database
+import pytest_asyncio
+from sqlalchemy import text, create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from alembic.config import Config as AlembicConfig
+from alembic import command
 
 from app.core.config import settings
 from app.db import models
-from app.db.base import Base
-from app.db.models import User
 from tests.factory import UserFactory
 
+# 🔧 Генерация уникального URL тестовой базы
+TEST_DB_NAME = f"test_{uuid.uuid4().hex[:8]}"
+TEST_DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)+TEST_DB_NAME
+
+# 🔄 Асинхронный движок и фабрика сессий
+engine = create_async_engine(TEST_DATABASE_URL, future=True)
+AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+
+from urllib.parse import urlparse, urlunparse
+
+def get_admin_url(test_url: str) -> str:
+    parsed = urlparse(test_url.replace("+asyncpg", "+psycopg2"))
+    return urlunparse(parsed._replace(path="/postgres"))
+
 
 @pytest.fixture(scope="session")
-def apply_migrations():
-    subprocess.run(["alembic", "upgrade", "head"], check=True)
+def event_loop():
+    loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
+
+@pytest.fixture(scope="session", autouse=True)
+def prepare_database():
+    # Создаем тестовую базу (через sync pg драйвер)
+    sync_url = TEST_DATABASE_URL.replace("+asyncpg", "+psycopg2")
+    sync_engine = create_engine(sync_url, future=True)
+
+    with sync_engine.connect() as conn:
+        conn.execution_options(isolation_level="AUTOCOMMIT").execute(
+            text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}")
+        )
+        conn.execution_options(isolation_level="AUTOCOMMIT").execute(
+            text(f"CREATE DATABASE {TEST_DB_NAME}")
+        )
+    sync_engine.dispose()
+
+    # Применяем миграции
+    alembic_cfg = AlembicConfig("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", TEST_DATABASE_URL)
+    command.upgrade(alembic_cfg, "head")
+
     yield
-    subprocess.run(["alembic", "downgrade", "base"], check=True)
 
+    # Удаляем базу
+    sync_engine = create_engine(sync_url, future=True)
+    with sync_engine.connect() as conn:
+        conn.execution_options(isolation_level="AUTOCOMMIT").execute(
+            text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}")
+        )
+    sync_engine.dispose()
 
-@pytest.fixture(scope="session")
-def test_db_url():
-    url = str(settings.SQLALCHEMY_DATABASE_URI) + "_test"
-    if not database_exists(url):
-        create_database(url)
-    return url
+@pytest_asyncio.fixture(scope="function")
+async def async_session():
+    async with AsyncSessionLocal() as session:
+        yield session
+        await session.rollback()
 
-
-@pytest.fixture(scope="session")
-def engine(test_db_url):
-    engine = create_engine(test_db_url)
-    Base.metadata.create_all(bind=engine)
-    yield engine
-    Base.metadata.drop_all(bind=engine)
-    drop_database(test_db_url)
-
-
-@pytest.fixture(scope="function")
-def session(engine):
-    testing_session_local = sessionmaker(bind=engine)
-    session = testing_session_local()
-    yield session
-    session.rollback()
-    session.close()
-
-
-@pytest.fixture(autouse=True)
-def clean_tables(session):
-    for table in reversed(Base.metadata.sorted_tables):
-        session.execute(table.delete())
-    session.commit()
-
-
-@pytest.fixture
-def user_creator(session):
-    def _factory(**kwargs):
-        UserFactory._meta.sqlalchemy_session = session  # pylint: disable=W0212
-        return UserFactory(**kwargs)
-
+# 🧪 Фабрика пользователей
+@pytest_asyncio.fixture
+async def user_creator(async_session):
+    async def _factory(commit: bool = False, **kwargs):
+        return await UserFactory.create(session=async_session, commit=commit, **kwargs)
     return _factory
 
+# ✅ Созданный пользователь
+@pytest_asyncio.fixture
+async def created_user(user_creator) -> models.User:
+    return await user_creator(commit=True)
 
-@pytest.fixture
-def created_user(user_creator) -> models.User:
-    return user_creator()
-
-
+# 🔀 UUID для тестов
 @pytest.fixture
 def fake_uuid():
     return uuid.uuid4()
 
+# 🧪 Данные пользователя через Faker
 @pytest.fixture
 def fake_user_data(faker):
-    """Генерация данных пользователя через Faker"""
     return {
         "email": faker.unique.email(),
         "username": faker.unique.user_name(),
