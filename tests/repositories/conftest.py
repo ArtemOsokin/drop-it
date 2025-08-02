@@ -1,17 +1,22 @@
-import pytest
+import datetime
 
-from app.db.models import User
+import pytest
+import pytest_asyncio
+
+from app.db import models
 from app.repositories.user import UserRepository
 
 
-@pytest.fixture
-def user_repo(session):
-    """Фикстура репозитория пользователей"""
+@pytest_asyncio.fixture
+async def user_repo(session):
+    """Создает репозиторий пользователей"""
     return UserRepository(db=session)
 
 
 @pytest.fixture
 def fake_user(fake_user_data):
-    fake_user_data.update({'hashed_password': fake_user_data.get('password')})
-    fake_user_data.pop('password')
-    return User(**fake_user_data)
+    """Создает экземпляр модели User для тестов"""
+    data = fake_user_data.copy()
+    data["birthday"] = datetime.datetime.fromisoformat(data["birthday"])
+    data['hashed_password'] = data.pop('password')
+    return models.User(**data)

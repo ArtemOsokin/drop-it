@@ -1,5 +1,7 @@
 import factory
+from factory.base import T
 from faker import Faker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import models
 
@@ -9,8 +11,7 @@ faker = Faker()
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         model = models.User
-        sqlalchemy_session_persistence = "commit"
-        sqlalchemy_session = None
+        abstract = False
 
     username = factory.LazyAttribute(lambda _: faker.unique.user_name())
     email = factory.LazyAttribute(lambda _: faker.unique.email())
@@ -26,3 +27,13 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     last_login = factory.LazyAttribute(
         lambda _: faker.date_time_this_year(before_now=True, after_now=False)
     )
+
+    @classmethod
+    async def create(cls, session: AsyncSession, commit: bool = False, *args, **kwargs) -> T:
+        obj = cls.build(**kwargs)
+        session.add(obj)
+        if commit:
+            await session.commit()
+        else:
+            await session.flush()
+        return obj

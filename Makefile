@@ -11,7 +11,7 @@ lint:
 .PHONY: format
 format:
 	autoflake --in-place --recursive $(CODE)
-	isort $(CODE)
+	isort $(CODE) --line-length 100
 	${BLACK} $(CODE)
 
 .PHONY: check

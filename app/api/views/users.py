@@ -2,13 +2,11 @@ import logging
 import uuid
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session as SessionType
 
 from app.api.dependencies.services import get_user_service
 from app.api.exceptions import user_exceptions
 from app.api.exceptions.error_messages import UserErrorMessage
 from app.api.exceptions.http_exceptions import BadRequest
-from app.db.engine import get_db
 from app.schemas import users as schemas_user
 from app.services.user import UserService
 

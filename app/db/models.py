@@ -18,7 +18,7 @@ class User(Base, TimestampMixin):
     hashed_password: Mapped[str] = mapped_column(String(100), nullable=False)
 
     is_artist: Mapped[bool] = mapped_column(Boolean, default=False)
-    birthday: Mapped[datetime] = mapped_column(DateTime)
+    birthday: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     avatar_url: Mapped[str] = mapped_column(String(512))
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)

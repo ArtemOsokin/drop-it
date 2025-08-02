@@ -6,6 +6,7 @@ from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
+from app.api.exceptions.error_messages import HTTPErrorMessage
 from app.api.exceptions.http_exceptions import Unauthorized
 from app.core.config import settings
 from app.schemas.auth import TokenData
@@ -62,10 +63,12 @@ class AuthUtils:
             token_type_payload: str = payload.get("type")
 
             if user_id is None or token_type_payload != token_type:
-                raise Unauthorized
+                raise Unauthorized(enum_error=HTTPErrorMessage.USER_UNAUTHORIZED)
 
             token_data = TokenData(user_id=uuid.UUID(user_id))
         except (JWTError, ValueError):
-            raise Unauthorized  # pylint: disable=W0707
+            raise Unauthorized(
+                enum_error=HTTPErrorMessage.USER_UNAUTHORIZED
+            )  # pylint: disable=W0707
 
         return token_data
