@@ -7,8 +7,8 @@ from app.db.models import User
 
 
 @pytest.mark.asyncio
-async def test_register(client, fake_user_data, session):
-    response = await client.post("api/v1/auth/register", json=fake_user_data)
+async def test_signup(client, fake_user_data, session):
+    response = await client.post("api/v1/auth/signup", json=fake_user_data)
 
     assert response.status_code == status.HTTP_201_CREATED
 
@@ -25,16 +25,16 @@ async def test_register(client, fake_user_data, session):
 
 
 @pytest.mark.asyncio
-async def test_register_username_error(client, fake_user_data, created_user):
+async def test_signup_username_error(client, fake_user_data, created_user):
     fake_user_data['username'] = created_user.username
-    response = await client.post("api/v1/auth/register", json=fake_user_data)
+    response = await client.post("api/v1/auth/signup", json=fake_user_data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()['error'] == AuthErrorMessage.USER_ALREADY_EXIST_USERNAME
 
 
 @pytest.mark.asyncio
-async def test_register_email_error(client, fake_user_data, created_user):
+async def test_signup_email_error(client, fake_user_data, created_user):
     fake_user_data['email'] = created_user.email
-    response = await client.post("api/v1/auth/register", json=fake_user_data)
+    response = await client.post("api/v1/auth/signup", json=fake_user_data)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()['error'] == AuthErrorMessage.USER_ALREADY_EXIST_EMAIL

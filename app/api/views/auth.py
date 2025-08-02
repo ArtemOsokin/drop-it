@@ -14,13 +14,13 @@ router = APIRouter(tags=["auth"], prefix="/api/v1/auth")
 
 
 @router.post(
-    path='/register',
+    path='/signup',
     response_model=schemas_auth.Token,
     status_code=status.HTTP_201_CREATED,
     summary="Register a new user",
     description="Create a new user and return user details.",
 )
-async def register(
+async def signup(
     user_data: schemas_user.UserCreate, auth_service: AuthService = Depends(get_auth_service)
 ):
     try:
