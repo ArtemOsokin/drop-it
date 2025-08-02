@@ -1,6 +1,7 @@
 import factory
 from factory.base import T
 from faker import Faker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import models
 
@@ -28,13 +29,11 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     )
 
     @classmethod
-    async def create(cls, session, commit:bool = False, **kwargs) -> T:
-        if hasattr(session, "__anext__"):
-            raise ValueError('Not Acync session')
+    async def create(cls, session: AsyncSession, commit: bool = False, *args, **kwargs) -> T:
         obj = cls.build(**kwargs)
         session.add(obj)
         if commit:
-            session.commit()
+            await session.commit()
         else:
-            session.flush()
+            await session.flush()
         return obj

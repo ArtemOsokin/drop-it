@@ -13,6 +13,7 @@ disable=C0412, # ungrouped-imports
         C0115, # missing-class-docstring
         C0116, # missing-function-docstring
         E1101, # no-member, Disabled because of https://github.com/PyCQA/pylint-django/issues/110
+        W0707, # raise-missing-from
 
 # Maximum number of nested code blocks for function / method
 max-nested-blocks=3

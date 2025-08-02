@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = 'postgres'
     POSTGRES_PASSWORD: str = 'postgres'
     POSTGRES_DB: str = 'postgres'
+    POSTGRES_URI: str = 'postgresql+psycopg2://postgres:postgres@localhost:5433/postgres'
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -30,7 +31,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
 
     @property
-    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:   # pylint: disable=C0103
+    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:  # pylint: disable=C0103
         return MultiHostUrl.build(
             scheme="postgresql+asyncpg",
             username=self.POSTGRES_USER,

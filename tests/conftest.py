@@ -1,93 +1,121 @@
-# pylint: disable=redefined-outer-name
-import asyncio
+import os
 import uuid
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import text, create_engine
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from alembic.config import Config as AlembicConfig
 from alembic import command
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from app.core.config import settings
+from app.core.config import settings as base_settings
 from app.db import models
 from tests.factory import UserFactory
 
-# 🔧 Генерация уникального URL тестовой базы
-TEST_DB_NAME = f"test_{uuid.uuid4().hex[:8]}"
-TEST_DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)+TEST_DB_NAME
-
-# 🔄 Асинхронный движок и фабрика сессий
-engine = create_async_engine(TEST_DATABASE_URL, future=True)
-AsyncSessionLocal = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
-
-from urllib.parse import urlparse, urlunparse
-
-def get_admin_url(test_url: str) -> str:
-    parsed = urlparse(test_url.replace("+asyncpg", "+psycopg2"))
-    return urlunparse(parsed._replace(path="/postgres"))
+TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"
+TEST_DB_NAME = f"{base_settings.POSTGRES_DB+TEST_DB_NAME_PREFIX}"
+TEST_DATABASE_URL = base_settings.POSTGRES_URI + TEST_DB_NAME_PREFIX
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
+@pytest_asyncio.fixture(scope="function")
+async def engine_test():
+    from sqlalchemy.ext.asyncio import create_async_engine
+
+    engine_test = create_async_engine(TEST_DATABASE_URL, future=True)
+    yield engine_test
+    await engine_test.dispose()
+
 
 @pytest.fixture(scope="session", autouse=True)
-def prepare_database():
-    # Создаем тестовую базу (через sync pg драйвер)
-    sync_url = TEST_DATABASE_URL.replace("+asyncpg", "+psycopg2")
-    sync_engine = create_engine(sync_url, future=True)
+def setup_test_db():
+    """Создание и удаление тестовой БД"""
+    import psycopg2
 
-    with sync_engine.connect() as conn:
-        conn.execution_options(isolation_level="AUTOCOMMIT").execute(
-            text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}")
-        )
-        conn.execution_options(isolation_level="AUTOCOMMIT").execute(
-            text(f"CREATE DATABASE {TEST_DB_NAME}")
-        )
-    sync_engine.dispose()
-
-    # Применяем миграции
-    alembic_cfg = AlembicConfig("alembic.ini")
-    alembic_cfg.set_main_option("sqlalchemy.url", TEST_DATABASE_URL)
-    command.upgrade(alembic_cfg, "head")
+    # Подключаемся к postgres и создаем отдельную тестовую БД
+    admin_url = str(base_settings.SQLALCHEMY_DATABASE_URI).replace("+asyncpg", "")
+    conn = psycopg2.connect(admin_url)
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}")
+    cur.execute(f"CREATE DATABASE {TEST_DB_NAME}")
+    conn.close()
 
     yield
 
-    # Удаляем базу
-    sync_engine = create_engine(sync_url, future=True)
-    with sync_engine.connect() as conn:
-        conn.execution_options(isolation_level="AUTOCOMMIT").execute(
-            text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}")
-        )
-    sync_engine.dispose()
+    # Удаление БД после тестов
+    conn = psycopg2.connect(admin_url)
+    conn.autocommit = True
+    cur = conn.cursor()
+    cur.execute(
+        f"""
+            SELECT pg_terminate_backend(pid)
+            FROM pg_stat_activity
+            WHERE datname = '{TEST_DB_NAME}'
+              AND pid <> pg_backend_pid();
+        """
+    )
+    cur.execute(f"DROP DATABASE IF EXISTS {TEST_DB_NAME}")
+    conn.close()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def apply_migrations(setup_test_db):
+    """Применяет миграции alembic к временной тестовой БД"""
+
+    from pathlib import Path
+
+    from alembic.config import Config
+
+    os.environ["POSTGRES_URI"] = TEST_DATABASE_URL.replace("+asyncpg", "+psycopg2")
+    alembic_cfg = Config(str(Path(__file__).parent.parent / "alembic.ini"))
+
+    command.upgrade(alembic_cfg, "head")
+
+    yield
+    command.downgrade(alembic_cfg, "base")
+
 
 @pytest_asyncio.fixture(scope="function")
-async def async_session():
-    async with AsyncSessionLocal() as session:
-        yield session
-        await session.rollback()
+async def session(engine_test):
+    """Асинхронная сессия для работы с БД"""
+    async_session_test = async_sessionmaker(bind=engine_test, expire_on_commit=False)
+    async with async_session_test() as session:
+        try:
+            yield session
+        finally:
+            await session.rollback()
 
-# 🧪 Фабрика пользователей
+
 @pytest_asyncio.fixture
-async def user_creator(async_session):
+async def user_creator(session):
     async def _factory(commit: bool = False, **kwargs):
-        return await UserFactory.create(session=async_session, commit=commit, **kwargs)
+        user = await UserFactory.create(session=session, commit=commit, **kwargs)
+        return user
+
     return _factory
 
-# ✅ Созданный пользователь
+
 @pytest_asyncio.fixture
 async def created_user(user_creator) -> models.User:
     return await user_creator(commit=True)
 
-# 🔀 UUID для тестов
+
+@pytest_asyncio.fixture(scope="function", autouse=True)
+async def clean_tables(session):
+    # Получаем все таблицы из metadata
+    tables = reversed(models.Base.metadata.sorted_tables)
+    # Отключаем внешние ключи и очищаем таблицы по очереди
+    async with session.begin():
+        for table in tables:
+            await session.execute(text(f"TRUNCATE TABLE {table.name} RESTART IDENTITY CASCADE"))
+    await session.commit()
+    yield
+
+
 @pytest.fixture
 def fake_uuid():
     return uuid.uuid4()
 
-# 🧪 Данные пользователя через Faker
+
 @pytest.fixture
 def fake_user_data(faker):
     return {

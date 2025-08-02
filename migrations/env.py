@@ -1,9 +1,10 @@
+import os
 from logging.config import fileConfig
+
 from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
-from app.core.config import settings
 from app.db import models  # noqa: F401
 from app.db.base import Base
 
@@ -17,7 +18,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Получаем оригинальный URL и заменяем asyncpg на psycopg2 для Alembic
-database_url = str(settings.SQLALCHEMY_DATABASE_URI).replace("+asyncpg", "+psycopg2")
+database_url = os.getenv("POSTGRES_URI", "").replace("+asyncpg", "+psycopg2")
 config.set_main_option("sqlalchemy.url", database_url)
 
 # Крайне важно обновить секцию конфигурации, чтобы engine_from_config взял новый URL

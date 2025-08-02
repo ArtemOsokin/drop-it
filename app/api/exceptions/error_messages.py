@@ -32,6 +32,7 @@ class UserErrorMessage(BaseErrorMessage):
         ERROR_MESSAGE: 'Пользователь не найден',
     }
 
+
 class AuthErrorMessage(BaseErrorMessage):
     USER_ALREADY_EXIST_EMAIL = {
         ERROR_CODE: 'user_already_exist_email',
