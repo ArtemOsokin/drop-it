@@ -1,10 +1,29 @@
 # Фикстуры для API тестов
 from typing import AsyncGenerator
+from unittest.mock import AsyncMock
 
+import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
+from app.api.dependencies.auth import get_current_user
+from app.api.exceptions.error_messages import HTTPErrorMessage
+from app.api.exceptions.http_exceptions import BadRequest, Unauthorized
+from app.core.security import AuthUtils
+from app.services.auth import AuthService
+from app.services.user import UserService
 from main import app
+
+
+@pytest_asyncio.fixture
+async def fake_token():
+    class FakeToken:
+        """Заменяет HTTPAuthorizationCredentials"""
+
+        def __init__(self, token: str):
+            self.credentials = token
+
+    return FakeToken
 
 
 @pytest_asyncio.fixture
@@ -32,3 +51,52 @@ async def client(test_app) -> AsyncGenerator[AsyncClient, None]:
     """Создает HTTP клиент для API тестов"""
     async with AsyncClient(transport=ASGITransport(app=test_app), base_url="http://test") as c:
         yield c
+
+
+@pytest.fixture(name='mock_service_get_user_by_id')
+def mock_service_get_user_by_id(mocker):
+    return mocker.patch.object(UserService, 'get_user_by_id', AsyncMock())
+
+
+@pytest.fixture(name='mock_service_register')
+def mock_service_register(mocker):
+    return mocker.patch.object(AuthService, 'register', AsyncMock())
+
+
+@pytest.fixture(name='mock_service_login')
+def mock_service_login(mocker):
+    return mocker.patch.object(AuthService, 'login', AsyncMock())
+
+
+@pytest_asyncio.fixture
+async def override_get_current_user(test_app, fake_user):
+
+    test_app.dependency_overrides[get_current_user] = lambda: fake_user
+    yield
+    test_app.dependency_overrides.clear()
+
+
+@pytest_asyncio.fixture
+async def override_get_current_user_unauthorized(test_app):
+    def raise_unauthorized():
+        raise Unauthorized(enum_error=BadRequest(enum_error=HTTPErrorMessage.USER_UNAUTHORIZED))
+
+    test_app.dependency_overrides[get_current_user] = raise_unauthorized
+    yield
+    test_app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def fake_token_data(fake_uuid) -> str:
+    payload = {"sub": str(fake_uuid)}
+    return {
+        "access_token": AuthUtils.create_access_token(payload),
+        "refresh_token": AuthUtils.create_refresh_token(payload),
+    }
+
+
+@pytest.fixture
+def fake_user_data_request(fake_user_data):
+    fake_user_data['created_at'] = fake_user_data['created_at'].isoformat()
+    fake_user_data['updated_at'] = fake_user_data['updated_at'].isoformat()
+    return fake_user_data

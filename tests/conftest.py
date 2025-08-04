@@ -1,5 +1,7 @@
+import datetime
 import os
 import uuid
+from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
@@ -9,7 +11,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.config import settings as base_settings
 from app.db import models
-from tests.factory import UserFactory
+from app.repositories.user import UserRepository
 
 TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"
 TEST_DB_NAME = f"{base_settings.POSTGRES_DB+TEST_DB_NAME_PREFIX}"
@@ -57,7 +59,7 @@ def setup_test_db():
     conn.close()
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def apply_migrations(setup_test_db):
     """Применяет миграции alembic к временной тестовой БД"""
 
@@ -85,21 +87,7 @@ async def session(engine_test):
             await session.rollback()
 
 
-@pytest_asyncio.fixture
-async def user_creator(session):
-    async def _factory(commit: bool = False, **kwargs):
-        user = await UserFactory.create(session=session, commit=commit, **kwargs)
-        return user
-
-    return _factory
-
-
-@pytest_asyncio.fixture
-async def created_user(user_creator) -> models.User:
-    return await user_creator(commit=True)
-
-
-@pytest_asyncio.fixture(scope="function", autouse=True)
+@pytest_asyncio.fixture(scope="function")
 async def clean_tables(session):
     # Получаем все таблицы из metadata
     tables = reversed(models.Base.metadata.sorted_tables)
@@ -126,4 +114,33 @@ def fake_user_data(faker):
         "birthday": faker.date_of_birth(minimum_age=18, maximum_age=70).isoformat(),
         "avatar_url": faker.image_url(),
         "password": faker.password(length=12, special_chars=True, digits=True),
+        "is_artist": False,
+        "is_active": True,
+        "is_verified": True,
+        "is_admin": False,
+        "created_at": datetime.datetime.now(),
+        "updated_at": datetime.datetime.now(),
     }
+
+
+@pytest.fixture
+def fake_user(fake_user_data):
+    """Создает экземпляр модели User для тестов"""
+    data = fake_user_data.copy()
+    data["birthday"] = datetime.datetime.fromisoformat(data["birthday"])
+    data['hashed_password'] = data.pop('password')
+    data['id'] = uuid.uuid4()
+    return models.User(**data)
+
+
+@pytest.fixture
+def fake_login_data(fake_user_data):
+    return {
+        'username': fake_user_data['username'],
+        'password': fake_user_data['password'],
+    }
+
+
+@pytest.fixture(name='mock_repo_get_user_by_id')
+def mock_repo_get_user_by_id(mocker):
+    return mocker.patch.object(UserRepository, 'get_user_by_id', AsyncMock())

@@ -3,7 +3,7 @@ from sqlalchemy import select
 
 from app.db.models import User
 
-pytestmark = pytest.mark.asyncio
+pytestmark = [pytest.mark.asyncio, pytest.mark.usefixtures('apply_migrations', 'clean_tables')]
 
 
 async def test_get_user_by_id(created_user, user_repo):

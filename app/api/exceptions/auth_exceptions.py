@@ -11,3 +11,11 @@ class UserAlreadyExistsEmail(BaseUserException):
 
 class UserAlreadyExistsUsername(BaseUserException):
     pass
+
+
+class IncorrectPassword(BaseUserException):
+    pass
+
+
+class IncorrectUsername(BaseUserException):
+    pass

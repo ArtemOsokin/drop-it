@@ -43,3 +43,13 @@ class AuthErrorMessage(BaseErrorMessage):
         ERROR_CODE: 'user_already_exist_username',
         ERROR_MESSAGE: 'Пользователь с таким Логином уже существует',
     }
+
+    INCORRECT_PASSWORD = {
+        ERROR_CODE: 'password_incorrect',
+        ERROR_MESSAGE: 'Неправильный пароль',
+    }
+
+    INCORRECT_USERNAME = {
+        ERROR_CODE: 'username_incorrect',
+        ERROR_MESSAGE: 'Неправильно введенный логин',
+    }
