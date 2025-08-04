@@ -8,7 +8,16 @@ from app.services.base import BaseServiceUserRepo
 
 class AuthService(BaseServiceUserRepo):
 
-    async def register(self, user_data: users_model.UserCreate) -> auth_model.Token:
+    @staticmethod
+    def _create_tokens(user_id: str) -> dict:
+        token_payload = {"sub": user_id}
+
+        return {
+            'access_token': AuthUtils.create_access_token(token_payload),
+            'refresh_token': AuthUtils.create_refresh_token(token_payload),
+        }
+
+    async def register(self, user_data: users_model.UserCreate) -> dict:
         if await self.user_repo.get_user_by_email(email=user_data.email):
             raise auth_exceptions.UserAlreadyExistsEmail
         if await self.user_repo.get_user_by_username(username=user_data.username):
@@ -18,10 +27,14 @@ class AuthService(BaseServiceUserRepo):
 
         user = User(**user_data.model_dump())
         created_user = await self.user_repo.create_user(user)
+        return self._create_tokens(str(created_user))
 
-        token_payload = {"sub": str(created_user.id)}
+    async def login(self, login_data: auth_model.UserLogin) -> dict:
+        user = await self.user_repo.get_user_by_username(username=login_data.username)
+        if not user:
+            raise auth_exceptions.IncorrectUsername
 
-        return auth_model.Token(
-            access_token=AuthUtils.create_access_token(token_payload),
-            refresh_token=AuthUtils.create_refresh_token(token_payload),
-        )
+        if not AuthUtils.verify_password(login_data.password, user.hashed_password):
+            raise auth_exceptions.IncorrectPassword
+
+        return self._create_tokens(user_id=str(user.id))

@@ -29,7 +29,7 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     )
 
     @classmethod
-    async def create(cls, session: AsyncSession, commit: bool = False, *args, **kwargs) -> T:
+    async def create(cls, session: AsyncSession, commit: bool = False, **kwargs) -> T:
         obj = cls.build(**kwargs)
         session.add(obj)
         if commit:
