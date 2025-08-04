@@ -38,3 +38,11 @@ class AuthService(BaseServiceUserRepo):
             raise auth_exceptions.IncorrectPassword
 
         return self._create_tokens(user_id=str(user.id))
+
+    async def change_password(self, pass_data: auth_model.PasswordChange, user: User) -> None:
+        if not AuthUtils.verify_password(pass_data.current_password, user.hashed_password):
+            raise auth_exceptions.IncorrectPassword
+
+        user.hashed_password = AuthUtils.get_password_hash(pass_data.new_password)
+
+        await self.user_repo.save_user(user)

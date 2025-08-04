@@ -67,6 +67,7 @@ async def test_login_success(
 
     mock_repo_get_user_by_username.return_value = fake_user
     tokens = await auth_service.login(login_data=fake_user_login)
+    mock_repo_get_user_by_username.assert_awaited_once_with(username=fake_user_login.username)
     assert tokens is not None
     assert "access_token" in tokens
     assert "refresh_token" in tokens
@@ -78,6 +79,7 @@ async def test_login_incorrect_username_error(
     mock_repo_get_user_by_username.return_value = None
     with pytest.raises(auth_exceptions.IncorrectUsername):
         await auth_service.login(login_data=fake_user_login)
+    mock_repo_get_user_by_username.assert_awaited_once_with(username=fake_user_login.username)
 
 
 async def test_login_incorrect_password_error(
@@ -90,3 +92,22 @@ async def test_login_incorrect_password_error(
     fake_user_login.password = faker.password()
     with pytest.raises(auth_exceptions.IncorrectPassword):
         await auth_service.login(login_data=fake_user_login)
+    mock_repo_get_user_by_username.assert_awaited_once_with(username=fake_user_login.username)
+
+
+async def test_change_password_success(
+    auth_service, fake_change_password, fake_user, mock_repo_save_user
+):
+    fake_user.hashed_password = AuthUtils.get_password_hash(fake_change_password.current_password)
+    mock_repo_save_user.return_value = fake_user
+    await auth_service.change_password(pass_data=fake_change_password, user=fake_user)
+    mock_repo_save_user.assert_awaited_once()
+
+
+async def test_change_password_incorrect_password_error(
+    auth_service, fake_change_password, fake_user, mock_repo_save_user
+):
+    fake_user.hashed_password = AuthUtils.get_password_hash(fake_user.hashed_password)
+    with pytest.raises(auth_exceptions.IncorrectPassword):
+        await auth_service.change_password(pass_data=fake_change_password, user=fake_user)
+    mock_repo_save_user.assert_not_awaited()

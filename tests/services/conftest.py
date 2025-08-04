@@ -4,7 +4,7 @@ import pytest
 import pytest_asyncio
 
 from app.repositories.user import UserRepository
-from app.schemas.auth import UserLogin
+from app.schemas.auth import PasswordChange, UserLogin
 from app.schemas.users import UserCreate, UserUpdate
 from app.services.auth import AuthService
 from app.services.user import UserService
@@ -23,6 +23,11 @@ def fake_user_update(fake_user_data):
 @pytest.fixture
 def fake_user_login(fake_login_data):
     return UserLogin(**fake_login_data)
+
+
+@pytest.fixture
+def fake_change_password(faker):
+    return PasswordChange(current_password=faker.password(), new_password=faker.password())
 
 
 @pytest_asyncio.fixture
