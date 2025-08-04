@@ -105,7 +105,7 @@ def fake_uuid():
 
 
 @pytest.fixture
-def fake_user_data(faker):
+def fake_update_user_data(faker):
     return {
         "email": faker.unique.email(),
         "username": faker.unique.user_name(),
@@ -113,14 +113,24 @@ def fake_user_data(faker):
         "last_name": faker.last_name(),
         "birthday": faker.date_of_birth(minimum_age=18, maximum_age=70).isoformat(),
         "avatar_url": faker.image_url(),
-        "password": faker.password(length=12, special_chars=True, digits=True),
         "is_artist": False,
-        "is_active": True,
-        "is_verified": True,
-        "is_admin": False,
-        "created_at": datetime.datetime.now(),
-        "updated_at": datetime.datetime.now(),
     }
+
+
+@pytest.fixture
+def fake_user_data(faker, fake_update_user_data):
+    data = fake_update_user_data.copy()
+    data.update(
+        {
+            "password": faker.password(length=12, special_chars=True, digits=True),
+            "is_active": True,
+            "is_verified": True,
+            "is_admin": False,
+            "created_at": datetime.datetime.now(),
+            "updated_at": datetime.datetime.now(),
+        }
+    )
+    return data
 
 
 @pytest.fixture

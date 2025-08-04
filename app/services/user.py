@@ -3,6 +3,7 @@ import uuid
 
 from app.api.exceptions import user_exceptions
 from app.db.models import User
+from app.schemas import users as schemas_users
 from app.services.base import BaseServiceUserRepo
 
 logger = logging.getLogger(__name__)
@@ -17,3 +18,12 @@ class UserService(BaseServiceUserRepo):
         if user:
             return user
         raise user_exceptions.UserNotFound
+
+    async def update_user(self, update_data: schemas_users.UserUpdate, user: User) -> User:
+        if await self.user_repo.get_user_by_email(email=update_data.email):
+            raise user_exceptions.EmailAlreadyExists
+        if await self.user_repo.get_user_by_username(username=update_data.username):
+            raise user_exceptions.UsernameAlreadyExists
+        for field, value in update_data.model_dump(exclude_unset=True).items():
+            setattr(user, field, value)
+        return await self.user_repo.save_user(user=user)

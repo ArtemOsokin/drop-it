@@ -26,7 +26,7 @@ class AuthService(BaseServiceUserRepo):
         user_data.hashed_password = AuthUtils.get_password_hash(user_data.hashed_password)
 
         user = User(**user_data.model_dump())
-        created_user = await self.user_repo.create_user(user)
+        created_user = await self.user_repo.save_user(user)
         return self._create_tokens(str(created_user))
 
     async def login(self, login_data: auth_model.UserLogin) -> dict:

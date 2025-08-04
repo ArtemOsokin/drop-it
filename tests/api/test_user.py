@@ -5,8 +5,9 @@ from app.api.exceptions import user_exceptions
 from app.api.exceptions.error_messages import UserErrorMessage
 from app.schemas.users import UserResponse
 
+pytestmark = pytest.mark.asyncio
 
-@pytest.mark.asyncio
+
 async def test_get_user_success(client, fake_user, mock_service_get_user_by_id):
     mock_service_get_user_by_id.return_value = fake_user
     response = await client.get(f'api/v1/users/{str(fake_user.id)}')
@@ -18,9 +19,65 @@ async def test_get_user_success(client, fake_user, mock_service_get_user_by_id):
     assert user_response.username == fake_user.username
 
 
-@pytest.mark.asyncio
 async def test_get_user_not_found(client, fake_uuid, mock_service_get_user_by_id):
     mock_service_get_user_by_id.side_effect = user_exceptions.UserNotFound
     response = await client.get(f'api/v1/users/{fake_uuid}')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()['error'] == UserErrorMessage.USER_NOT_FOUND
+
+
+async def test_update_me_success(
+    override_get_current_user,
+    client,
+    fake_update_user_data,
+    fake_token_data,
+    fake_user,
+    mock_service_update_user,
+):
+    mock_service_update_user.return_value = fake_user
+    response = await client.patch(
+        "api/v1/users/me",
+        headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
+        json=fake_update_user_data,
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    user = response.json()
+    assert user is not None
+    assert user['id'] is not None
+    assert user['email'] == fake_user.email
+    assert user['username'] == fake_user.username
+
+
+async def test_update_me_username_error(
+    override_get_current_user,
+    client,
+    fake_update_user_data,
+    fake_token_data,
+    mock_service_update_user,
+):
+    mock_service_update_user.side_effect = user_exceptions.UsernameAlreadyExists
+    response = await client.patch(
+        "api/v1/users/me",
+        headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
+        json=fake_update_user_data,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()['error'] == UserErrorMessage.USERNAME_ALREADY_EXIST
+
+
+async def test_update_me_email_error(
+    override_get_current_user,
+    client,
+    fake_update_user_data,
+    fake_token_data,
+    mock_service_update_user,
+):
+    mock_service_update_user.side_effect = user_exceptions.EmailAlreadyExists
+    response = await client.patch(
+        "api/v1/users/me",
+        headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
+        json=fake_update_user_data,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()['error'] == UserErrorMessage.EMAIL_ALREADY_EXIST
