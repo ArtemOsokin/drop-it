@@ -73,6 +73,11 @@ def mock_service_login(mocker):
     return mocker.patch.object(AuthService, 'login', AsyncMock())
 
 
+@pytest.fixture(name='mock_service_change_password')
+def mock_service_change_password(mocker):
+    return mocker.patch.object(AuthService, 'change_password', AsyncMock())
+
+
 @pytest_asyncio.fixture
 async def override_get_current_user(test_app, fake_user):
 

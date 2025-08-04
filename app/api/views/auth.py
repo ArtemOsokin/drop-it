@@ -51,6 +51,24 @@ async def login(
     return schemas_auth.Token.model_validate(tokens)
 
 
+@router.post(
+    path='/change-password',
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Change password",
+    description="Change password.",
+)
+async def change_password(
+    pass_data: schemas_auth.PasswordChange,
+    current_user: User = Depends(get_current_user),
+    auth_service: AuthService = Depends(get_auth_service),
+):
+    try:
+        await auth_service.change_password(pass_data=pass_data, user=current_user)
+    except auth_exceptions.IncorrectPassword:
+        raise BadRequest(enum_error=AuthErrorMessage.INCORRECT_PASSWORD)
+    return
+
+
 @router.get(
     path='/me',
     response_model=schemas_user.UserResponse,
