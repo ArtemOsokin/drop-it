@@ -16,10 +16,16 @@ async def test_user_service_without_db(fake_user_create):
 
 
 async def test_register_success(
-    fake_user_create, auth_service, mock_repo_get_user_by_username, mock_repo_get_user_by_email
+    fake_user_create,
+    auth_service,
+    mock_repo_get_user_by_username,
+    mock_repo_get_user_by_email,
+    mock_repo_save_user,
+    fake_user,
 ):
     mock_repo_get_user_by_email.return_value = None
     mock_repo_get_user_by_username.return_value = None
+    mock_repo_save_user.return_value = fake_user
     tokens = await auth_service.register(user_data=fake_user_create)
     tokens = json.dumps(tokens)
     assert tokens is not None
@@ -53,7 +59,6 @@ async def test_register_email_error(
         await auth_service.register(user_data=fake_user_create)
 
 
-@pytest.mark.asyncio
 async def test_login_success(
     auth_service, fake_user_login, mock_repo_get_user_by_username, fake_user
 ):
@@ -67,7 +72,6 @@ async def test_login_success(
     assert "refresh_token" in tokens
 
 
-@pytest.mark.asyncio
 async def test_login_incorrect_username_error(
     auth_service, fake_user_login, mock_repo_get_user_by_username
 ):
@@ -76,7 +80,6 @@ async def test_login_incorrect_username_error(
         await auth_service.login(login_data=fake_user_login)
 
 
-@pytest.mark.asyncio
 async def test_login_incorrect_password_error(
     auth_service, fake_user_login, mock_repo_get_user_by_username, fake_user, faker
 ):

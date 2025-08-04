@@ -58,6 +58,11 @@ def mock_service_get_user_by_id(mocker):
     return mocker.patch.object(UserService, 'get_user_by_id', AsyncMock())
 
 
+@pytest.fixture(name='mock_service_update_user')
+def mock_service_update_user(mocker):
+    return mocker.patch.object(UserService, 'update_user', AsyncMock())
+
+
 @pytest.fixture(name='mock_service_register')
 def mock_service_register(mocker):
     return mocker.patch.object(AuthService, 'register', AsyncMock())

@@ -41,8 +41,8 @@ async def test_get_user_by_email_none(faker, user_repo):
     assert user is None
 
 
-async def test_create_user(session, fake_user, user_repo):
-    user = await user_repo.create_user(fake_user)
+async def test_save_user(session, fake_user, user_repo):
+    user = await user_repo.save_user(fake_user)
     assert user is not None
     assert user.id is not None
     assert user.email == fake_user.email
@@ -57,21 +57,21 @@ async def test_create_user(session, fake_user, user_repo):
     assert db_user.id == user.id
 
 
-async def test_create_user_duplicate_email(created_user, fake_user_data, user_repo):
+async def test_save_user_duplicate_email(created_user, fake_user_data, user_repo):
     duplicate_user_data = fake_user_data.copy()
     duplicate_user_data['email'] = created_user.email
     duplicate_user_data['hashed_password'] = duplicate_user_data.pop('password')
     duplicate_user = User(**duplicate_user_data)
 
     with pytest.raises(Exception):
-        await user_repo.create_user(duplicate_user)
+        await user_repo.save_user(duplicate_user)
 
 
-async def test_create_user_duplicate_username(created_user, fake_user_data, user_repo):
+async def test_save_user_duplicate_username(created_user, fake_user_data, user_repo):
     duplicate_user_data = fake_user_data.copy()
     duplicate_user_data['username'] = created_user.username
     duplicate_user_data['hashed_password'] = duplicate_user_data.pop('password')
     duplicate_user = User(**duplicate_user_data)
 
     with pytest.raises(Exception):
-        await user_repo.create_user(duplicate_user)
+        await user_repo.save_user(duplicate_user)
