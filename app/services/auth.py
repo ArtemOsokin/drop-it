@@ -1,6 +1,6 @@
 from app.api.exceptions import auth_exceptions
 from app.core.security import AuthUtils
-from app.db.models import User
+from app.db.models.user import User
 from app.schemas import auth as auth_model
 from app.schemas import users as users_model
 from app.services.base import BaseServiceUserRepo

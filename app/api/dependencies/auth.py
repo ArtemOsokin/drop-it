@@ -6,7 +6,7 @@ from app.api.exceptions.error_messages import HTTPErrorMessage
 from app.api.exceptions.http_exceptions import Unauthorized
 from app.core.security import AuthUtils, security
 from app.db.engine import get_async_session
-from app.db.models import User
+from app.db.models.user import User
 from app.repositories.user import UserRepository
 
 

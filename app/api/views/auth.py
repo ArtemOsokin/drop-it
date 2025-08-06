@@ -5,7 +5,7 @@ from app.api.dependencies.services import get_auth_service
 from app.api.exceptions import auth_exceptions
 from app.api.exceptions.error_messages import AuthErrorMessage
 from app.api.exceptions.http_exceptions import BadRequest
-from app.db.models import User
+from app.db.models.user import User
 from app.schemas import auth as schemas_auth
 from app.schemas import users as schemas_user
 from app.services.auth import AuthService
