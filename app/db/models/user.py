@@ -1,3 +1,4 @@
+# flake8: noqa: F821
 import datetime as dt
 import uuid
 from typing import List
@@ -36,7 +37,11 @@ class User(IDMixin, TimestampMixin):
         passive_deletes=True,
     )
     likes: Mapped[List["Like"]] = relationship(
-        "Like", back_populates="user", cascade="all, delete-orphan", passive_deletes=True
+        "Like",
+        back_populates="user",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        lazy=LAZY_TYPE,
     )
 
 
@@ -52,7 +57,7 @@ class Like(IDMixin):
     )
 
     created_at: Mapped[dt.datetime] = mapped_column(
-        DateTime(timezone=True), default=func.now(), nullable=False
+        DateTime(timezone=True), default=func.now, nullable=False
     )
 
     user: Mapped["User"] = relationship("User", back_populates="likes", lazy=LAZY_TYPE)

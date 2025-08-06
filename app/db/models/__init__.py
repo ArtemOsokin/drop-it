@@ -1,5 +1,5 @@
-from .base import *
-from .drop import *
-from .user import *
+from .base import Base
+from .drop import Drop, Genre
+from .user import User, Like
 
-__all__ = ['Base', 'User', 'Drop']
+__all__ = ['Base', 'User', 'Drop', 'Genre', 'Like']

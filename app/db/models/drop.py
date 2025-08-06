@@ -1,3 +1,4 @@
+# flake8: noqa: F821
 import datetime as dt
 import uuid
 from typing import List
