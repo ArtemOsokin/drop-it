@@ -8,9 +8,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
         start_time = time.time()
 
-        # Логируем входящий запрос
-        logger.info(f"➡️ Request: {request.method} {request.url}")
-
         try:
             response = await call_next(request)
         except Exception as exc:
@@ -18,7 +15,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             raise
 
         process_time = (time.time() - start_time) * 1000
-        logger.info(f"⬅️ Response: {request.method} {request.url} — {response.status_code} "
+        logger.info(f"{request.method} {request.url} — {response.status_code} "
                     f"({process_time:.2f} ms)")
 
         return response

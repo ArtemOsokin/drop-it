@@ -15,15 +15,10 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    ENVIRONMENT: Literal["local", "dev", "prod"] = "local"
+    APP_HOST: str = "localhost"
+    APP_PORT: int = 32165
 
-    # DB Settings
-    POSTGRES_HOST: str = 'localhost'
-    POSTGRES_PORT: int = 5432
-    POSTGRES_USER: str = 'postgres'
-    POSTGRES_PASSWORD: str = 'postgres'
-    POSTGRES_DB: str = 'postgres'
-    POSTGRES_URI: str = 'postgresql+psycopg2://postgres:postgres@localhost:5433/postgres'
+    ENVIRONMENT: Literal["local", "dev", "prod"] = "local"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -32,6 +27,14 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = 'DEBUG'
     LOG_PATH: str = 'logs/app.log'
+
+    # DB Settings
+    POSTGRES_HOST: str = 'localhost'
+    POSTGRES_PORT: int = 5432
+    POSTGRES_USER: str = 'postgres'
+    POSTGRES_PASSWORD: str = 'postgres'
+    POSTGRES_DB: str = 'postgres'
+    POSTGRES_URI: str = 'postgresql+psycopg2://postgres:postgres@localhost:5433/postgres'
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:  # pylint: disable=C0103
