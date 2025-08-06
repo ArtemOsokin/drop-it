@@ -10,7 +10,7 @@ from app.schemas import auth as schemas_auth
 from app.schemas import users as schemas_user
 from app.services.auth import AuthService
 
-router = APIRouter(tags=["auth"], prefix="/api/v1/auth")
+router = APIRouter()
 
 
 @router.post(

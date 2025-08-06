@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your-super-secret-key"
     ALGORITHM: str = "HS256"
 
+    LOG_LEVEL: str = 'DEBUG'
+    LOG_PATH: str = 'logs/app.log'
+
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:  # pylint: disable=C0103
         return MultiHostUrl.build(

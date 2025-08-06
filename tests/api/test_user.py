@@ -10,7 +10,7 @@ pytestmark = pytest.mark.asyncio
 
 async def test_get_user_success(client, fake_user, mock_service_get_user_by_id):
     mock_service_get_user_by_id.return_value = fake_user
-    response = await client.get(f'api/v1/users/{str(fake_user.id)}')
+    response = await client.get(f'v1/users/{str(fake_user.id)}')
     assert response.status_code == status.HTTP_200_OK
 
     user_response = UserResponse.model_validate(response.json())
@@ -21,7 +21,7 @@ async def test_get_user_success(client, fake_user, mock_service_get_user_by_id):
 
 async def test_get_user_not_found(client, fake_uuid, mock_service_get_user_by_id):
     mock_service_get_user_by_id.side_effect = user_exceptions.UserNotFound
-    response = await client.get(f'api/v1/users/{fake_uuid}')
+    response = await client.get(f'v1/users/{fake_uuid}')
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()['error'] == UserErrorMessage.USER_NOT_FOUND
 
@@ -36,7 +36,7 @@ async def test_update_me_success(
 ):
     mock_service_update_user.return_value = fake_user
     response = await client.patch(
-        "api/v1/users/me",
+        "v1/users/me",
         headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
         json=fake_update_user_data,
     )
@@ -58,7 +58,7 @@ async def test_update_me_username_error(
 ):
     mock_service_update_user.side_effect = user_exceptions.UsernameAlreadyExists
     response = await client.patch(
-        "api/v1/users/me",
+        "v1/users/me",
         headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
         json=fake_update_user_data,
     )
@@ -75,7 +75,7 @@ async def test_update_me_email_error(
 ):
     mock_service_update_user.side_effect = user_exceptions.EmailAlreadyExists
     response = await client.patch(
-        "api/v1/users/me",
+        "v1/users/me",
         headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
         json=fake_update_user_data,
     )
