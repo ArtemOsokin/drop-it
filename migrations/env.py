@@ -5,8 +5,7 @@ from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
-from app.db.models.base import Base
-from app.db.models.user import User  # noqa: F401
+from app.db import models
 
 load_dotenv()
 
@@ -15,7 +14,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+target_metadata = models.Base.metadata
 
 # Получаем оригинальный URL и заменяем asyncpg на psycopg2 для Alembic
 database_url = os.getenv("POSTGRES_URI", "").replace("+asyncpg", "+psycopg2")
