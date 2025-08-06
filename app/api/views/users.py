@@ -1,4 +1,3 @@
-import logging
 import uuid
 
 from fastapi import APIRouter, Depends, status
@@ -12,11 +11,7 @@ from app.db.models import User
 from app.schemas import users as schemas_user
 from app.services.user import UserService
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
-logger.setLevel(logging.INFO)
-
-router = APIRouter(tags=["users"], prefix="/api/v1/users")
+router = APIRouter()
 
 
 @router.get(
