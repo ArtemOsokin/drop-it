@@ -3,14 +3,14 @@ from factory.base import T
 from faker import Faker
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import models
+from app.db.models.user import User
 
 faker = Faker()
 
 
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
-        model = models.User
+        model = User
         abstract = False
 
     username = factory.LazyAttribute(lambda _: faker.unique.user_name())

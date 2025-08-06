@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from app.api.exceptions import user_exceptions
-from app.db.models import User
+from app.db.models.user import User
 from app.schemas import users as schemas_users
 from app.services.base import BaseServiceUserRepo
 

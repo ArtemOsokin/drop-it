@@ -91,7 +91,6 @@ async def test_change_password_success(
     mock_service_change_password,
     client,
     fake_token_data,
-    fake_user,
     faker,
 ):
     response = await client.post(

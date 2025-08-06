@@ -1,6 +1,6 @@
 import pytest_asyncio
 
-from app.db import models
+from app.db.models.user import User
 from app.repositories.user import UserRepository
 from tests.factory import UserFactory
 
@@ -15,7 +15,7 @@ async def user_creator(session):
 
 
 @pytest_asyncio.fixture
-async def created_user(user_creator) -> models.User:
+async def created_user(user_creator) -> User:
     return await user_creator(commit=True)
 
 

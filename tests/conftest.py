@@ -10,7 +10,8 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.config import settings as base_settings
-from app.db import models
+from app.db.models.base import Base
+from app.db.models.user import User
 from app.repositories.user import UserRepository
 
 TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"
@@ -90,7 +91,7 @@ async def session(engine_test):
 @pytest_asyncio.fixture(scope="function")
 async def clean_tables(session):
     # Получаем все таблицы из metadata
-    tables = reversed(models.Base.metadata.sorted_tables)
+    tables = reversed(Base.metadata.sorted_tables)
     # Отключаем внешние ключи и очищаем таблицы по очереди
     async with session.begin():
         for table in tables:
@@ -140,7 +141,7 @@ def fake_user(fake_user_data):
     data["birthday"] = datetime.datetime.fromisoformat(data["birthday"])
     data['hashed_password'] = data.pop('password')
     data['id'] = uuid.uuid4()
-    return models.User(**data)
+    return User(**data)
 
 
 @pytest.fixture
