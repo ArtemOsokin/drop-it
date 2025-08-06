@@ -10,8 +10,9 @@ from app.api.dependencies.auth import get_current_user
 from app.api.exceptions.error_messages import HTTPErrorMessage
 from app.api.exceptions.http_exceptions import BadRequest, Unauthorized
 from app.core.security import AuthUtils
+from app.repositories.interfaces import IUserRepository
 from app.services.auth import AuthService
-from app.services.user import UserService
+from app.services.users import UserService
 from main import app
 
 
@@ -110,3 +111,10 @@ def fake_user_data_request(fake_user_data):
     fake_user_data['created_at'] = fake_user_data['created_at'].isoformat()
     fake_user_data['updated_at'] = fake_user_data['updated_at'].isoformat()
     return fake_user_data
+
+
+@pytest.fixture(name='mock_user_repo')
+def mock_user_repo():
+    repo = AsyncMock(spec=IUserRepository)
+    repo.get_user_by_id = AsyncMock(return_value=None)
+    return repo

@@ -8,7 +8,7 @@ from app.api.exceptions.http_exceptions import BadRequest
 from app.db.models.user import User
 from app.schemas import auth as schemas_auth
 from app.schemas import users as schemas_user
-from app.services.auth import AuthService
+from app.services.interfaces import IAuthService
 
 router = APIRouter()
 
@@ -21,7 +21,7 @@ router = APIRouter()
     description="Create a new user and return user details.",
 )
 async def signup(
-    user_data: schemas_user.UserCreate, auth_service: AuthService = Depends(get_auth_service)
+    user_data: schemas_user.UserCreate, auth_service: IAuthService = Depends(get_auth_service)
 ):
     try:
         tokens = await auth_service.register(user_data=user_data)
@@ -40,7 +40,7 @@ async def signup(
     description="Login user.",
 )
 async def login(
-    login_data: schemas_auth.UserLogin, auth_service: AuthService = Depends(get_auth_service)
+    login_data: schemas_auth.UserLogin, auth_service: IAuthService = Depends(get_auth_service)
 ):
     try:
         tokens = await auth_service.login(login_data=login_data)
@@ -60,7 +60,7 @@ async def login(
 async def change_password(
     pass_data: schemas_auth.PasswordChange,
     current_user: User = Depends(get_current_user),
-    auth_service: AuthService = Depends(get_auth_service),
+    auth_service: IAuthService = Depends(get_auth_service),
 ):
     try:
         await auth_service.change_password(pass_data=pass_data, user=current_user)

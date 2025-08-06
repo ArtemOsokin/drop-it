@@ -1,7 +1,6 @@
 import datetime
 import os
 import uuid
-from unittest.mock import AsyncMock
 
 import pytest
 import pytest_asyncio
@@ -12,7 +11,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 from app.core.config import settings as base_settings
 from app.db.models.base import Base
 from app.db.models.user import User
-from app.repositories.user import UserRepository
 
 TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"
 TEST_DB_NAME = f"{base_settings.POSTGRES_DB+TEST_DB_NAME_PREFIX}"
@@ -150,8 +148,3 @@ def fake_login_data(fake_user_data):
         'username': fake_user_data['username'],
         'password': fake_user_data['password'],
     }
-
-
-@pytest.fixture(name='mock_repo_get_user_by_id')
-def mock_repo_get_user_by_id(mocker):
-    return mocker.patch.object(UserRepository, 'get_user_by_id', AsyncMock())

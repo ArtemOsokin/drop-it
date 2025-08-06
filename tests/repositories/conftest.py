@@ -1,7 +1,7 @@
 import pytest_asyncio
 
 from app.db.models.user import User
-from app.repositories.user import UserRepository
+from app.repositories.users import UserRepository
 from tests.factory import UserFactory
 
 

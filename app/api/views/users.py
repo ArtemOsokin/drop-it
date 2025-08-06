@@ -9,7 +9,8 @@ from app.api.exceptions.error_messages import UserErrorMessage
 from app.api.exceptions.http_exceptions import BadRequest
 from app.db.models.user import User
 from app.schemas import users as schemas_user
-from app.services.user import UserService
+from app.services.interfaces import IUserService
+from app.services.users import UserService
 
 router = APIRouter()
 
@@ -22,7 +23,7 @@ router = APIRouter()
     description="Get user details by user ID (UUID).",
 )
 async def get_user(
-    user_id: uuid.UUID, user_service: UserService = Depends(get_user_service)
+    user_id: uuid.UUID, user_service: IUserService = Depends(get_user_service)
 ) -> schemas_user.UserResponse:
     try:
         user = await user_service.get_user_by_id(user_id=user_id)

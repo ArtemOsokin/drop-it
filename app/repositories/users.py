@@ -2,9 +2,10 @@ from sqlalchemy import select
 
 from app.db.models.user import User
 from app.repositories.base import BaseRepository
+from app.repositories.interfaces import IUserRepository
 
 
-class UserRepository(BaseRepository):
+class UserRepository(BaseRepository, IUserRepository):
 
     async def get_user_by_id(self, user_id: int) -> User | None:
         result = await self.db.execute(select(User).where(User.id == user_id))

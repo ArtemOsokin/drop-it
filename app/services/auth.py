@@ -1,12 +1,14 @@
 from app.api.exceptions import auth_exceptions
 from app.core.security import AuthUtils
 from app.db.models.user import User
+from app.repositories.interfaces import IUserRepository
 from app.schemas import auth as auth_model
 from app.schemas import users as users_model
-from app.services.base import BaseServiceUserRepo
 
 
-class AuthService(BaseServiceUserRepo):
+class AuthService:
+    def __init__(self, user_repo: IUserRepository) -> None:
+        self.user_repo = user_repo
 
     @staticmethod
     def _create_tokens(user_id: str) -> dict:
