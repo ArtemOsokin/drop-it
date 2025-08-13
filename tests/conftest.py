@@ -1,4 +1,5 @@
-import datetime
+# pylint: disable=redefined-outer-name,import-outside-toplevel,unused-argument
+import datetime as dt
 import os
 import uuid
 
@@ -10,7 +11,9 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.config import settings as base_settings
 from app.db.models.base import Base
+from app.db.models.drop import Drop, Genre
 from app.db.models.user import User
+from tests.factory import GenreFactory, UserFactory
 
 TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"
 TEST_DB_NAME = f"{base_settings.POSTGRES_DB+TEST_DB_NAME_PREFIX}"
@@ -98,6 +101,9 @@ async def clean_tables(session):
     yield
 
 
+# ==== Faker Fixtures ====
+
+
 @pytest.fixture
 def fake_uuid():
     return uuid.uuid4()
@@ -125,21 +131,70 @@ def fake_user_data(faker, fake_update_user_data):
             "is_active": True,
             "is_verified": True,
             "is_admin": False,
-            "created_at": datetime.datetime.now(),
-            "updated_at": datetime.datetime.now(),
+            "created_at": dt.datetime.now(),
+            "updated_at": dt.datetime.now(),
         }
     )
     return data
 
 
+@pytest_asyncio.fixture
+async def fake_user() -> User:
+    return await UserFactory.create()
+
+
+@pytest_asyncio.fixture
+async def fake_user_with_meta(fake_user, fake_uuid) -> User:
+    fake_user.id = fake_uuid
+    fake_user.updated_at = dt.datetime.now(dt.timezone.utc)
+    fake_user.created_at = dt.datetime.now(dt.timezone.utc)
+    return fake_user
+
+
 @pytest.fixture
-def fake_user(fake_user_data):
-    """Создает экземпляр модели User для тестов"""
-    data = fake_user_data.copy()
-    data["birthday"] = datetime.datetime.fromisoformat(data["birthday"])
-    data['hashed_password'] = data.pop('password')
-    data['id'] = uuid.uuid4()
-    return User(**data)
+def fake_genre_data(faker):
+    """Генерирует словарь с данными для Genre"""
+    return {
+        "name": faker.word(),
+        "slug": faker.slug(),
+        "created_at": dt.datetime.now(dt.timezone.utc),
+        "updated_at": dt.datetime.now(dt.timezone.utc),
+    }
+
+
+@pytest_asyncio.fixture
+async def fake_genre() -> Genre:
+    return await GenreFactory.create()
+
+
+@pytest.fixture
+def fake_drop_data_generator(faker):
+    """Универсальный генератор данных для Drop"""
+
+    def _generate(genre_id=None, artist_id=None):
+        return {
+            "artist_id": artist_id if artist_id else None,
+            "genre_id": genre_id if genre_id else None,
+            "title": faker.sentence(nb_words=4),
+            "description": faker.text(max_nb_chars=200),
+            "file_url": faker.url(),
+            "cover_url": faker.url(),
+            "is_archived": False,
+            "is_expired": False,
+            "expires_at": dt.datetime.now() + dt.timedelta(days=7),
+            "created_at": dt.datetime.now(),
+            "updated_at": dt.datetime.now(),
+        }
+
+    return _generate
+
+
+@pytest.fixture
+def fake_drop(fake_drop_data_generator, fake_user, fake_genre) -> Drop:
+    """Создает экземпляр Genre"""
+    data = fake_drop_data_generator(artist_id=fake_user.id, genre_id=fake_genre.id)
+    data["id"] = uuid.uuid4()
+    return Drop(**data)
 
 
 @pytest.fixture

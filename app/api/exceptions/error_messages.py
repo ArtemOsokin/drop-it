@@ -61,3 +61,10 @@ class AuthErrorMessage(BaseErrorMessage):
         ERROR_CODE: 'username_incorrect',
         ERROR_MESSAGE: 'Неправильно введенный логин',
     }
+
+
+class DropErrorMessage(BaseErrorMessage):
+    GENRE_NOT_FOUND = {
+        ERROR_CODE: 'genre_not_found',
+        ERROR_MESSAGE: 'Жанр отсутствует',
+    }

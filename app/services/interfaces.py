@@ -1,8 +1,9 @@
 import uuid
 from typing import Protocol
 
-from app.db.models import User
+from app.db.models import Drop, User
 from app.schemas import auth as schemas_auth
+from app.schemas import drops as schemas_drops
 from app.schemas import users as schemas_users
 
 
@@ -15,3 +16,9 @@ class IAuthService(Protocol):
     async def register(self, user_data: schemas_users.UserCreate) -> dict: ...
     async def login(self, login_data: schemas_auth.UserLogin) -> dict: ...
     async def change_password(self, pass_data: schemas_auth.PasswordChange, user: User) -> None: ...
+
+
+class IDropService(Protocol):
+    async def create_drop(
+        self, drop_data: schemas_drops.DropCreate, user_id: uuid.UUID
+    ) -> Drop: ...

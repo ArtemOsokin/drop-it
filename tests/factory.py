@@ -3,12 +3,29 @@ from factory.base import T
 from faker import Faker
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.db.models import Genre
 from app.db.models.user import User
 
 faker = Faker()
 
 
-class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
+class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
+    class Meta:
+        abstract = True
+
+    @classmethod
+    async def create(cls, session: AsyncSession = None, commit: bool = False, **kwargs) -> T:
+        obj = cls.build(**kwargs)
+        if session:
+            session.add(obj)
+            if commit:
+                await session.commit()
+            else:
+                await session.flush()
+        return obj
+
+
+class UserFactory(BaseFactory):
     class Meta:
         model = User
         abstract = False
@@ -28,12 +45,11 @@ class UserFactory(factory.alchemy.SQLAlchemyModelFactory):
         lambda _: faker.date_time_this_year(before_now=True, after_now=False)
     )
 
-    @classmethod
-    async def create(cls, session: AsyncSession, commit: bool = False, **kwargs) -> T:
-        obj = cls.build(**kwargs)
-        session.add(obj)
-        if commit:
-            await session.commit()
-        else:
-            await session.flush()
-        return obj
+
+class GenreFactory(BaseFactory):
+    class Meta:
+        model = Genre
+        abstract = False
+
+    name = factory.LazyAttribute(lambda _: faker.word())
+    slug = factory.LazyAttribute(lambda _: faker.word())

@@ -71,10 +71,10 @@ async def change_password(
 
 @router.get(
     path='/me',
-    response_model=schemas_user.UserResponse,
+    response_model=schemas_user.UserRead,
     status_code=status.HTTP_200_OK,
     summary="Information about current user",
     description="Information about current user.",
 )
 async def get_me(current_user: User = Depends(get_current_user)):
-    return schemas_user.UserResponse.model_validate(current_user)
+    return schemas_user.UserRead.model_validate(current_user)

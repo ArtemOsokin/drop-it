@@ -1,4 +1,4 @@
-# Фикстуры для API тестов
+# pylint: disable=redefined-outer-name,import-outside-toplevel
 from typing import AsyncGenerator
 from unittest.mock import AsyncMock
 
@@ -12,6 +12,7 @@ from app.api.exceptions.http_exceptions import BadRequest, Unauthorized
 from app.core.security import AuthUtils
 from app.repositories.interfaces import IUserRepository
 from app.services.auth import AuthService
+from app.services.drops import DropService
 from app.services.users import UserService
 from main import app
 
@@ -79,10 +80,15 @@ def mock_service_change_password(mocker):
     return mocker.patch.object(AuthService, 'change_password', AsyncMock())
 
 
-@pytest_asyncio.fixture
-async def override_get_current_user(test_app, fake_user):
+@pytest.fixture(name='mock_service_create_drop')
+def mock_service_create_drop(mocker):
+    return mocker.patch.object(DropService, 'create_drop', AsyncMock())
 
-    test_app.dependency_overrides[get_current_user] = lambda: fake_user
+
+@pytest_asyncio.fixture
+async def override_get_current_user(test_app, fake_user_with_meta, fake_uuid):
+
+    test_app.dependency_overrides[get_current_user] = lambda: fake_user_with_meta
     yield
     test_app.dependency_overrides.clear()
 
@@ -103,6 +109,16 @@ def fake_token_data(fake_uuid) -> str:
     return {
         "access_token": AuthUtils.create_access_token(payload),
         "refresh_token": AuthUtils.create_refresh_token(payload),
+    }
+
+
+@pytest.fixture
+def fake_drop_data_request(faker) -> str:
+    return {
+        'title': faker.sentence(nb_words=3),
+        'description': faker.text(max_nb_chars=200),
+        'file_url': faker.url(),
+        'cover_url': faker.url(),
     }
 
 
