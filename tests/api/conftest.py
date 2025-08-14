@@ -1,4 +1,4 @@
-# Фикстуры для API тестов
+# pylint: disable=redefined-outer-name,import-outside-toplevel
 from typing import AsyncGenerator
 from unittest.mock import AsyncMock
 
@@ -7,11 +7,13 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 from app.api.dependencies.auth import get_current_user
-from app.api.exceptions.error_messages import HTTPErrorMessage
-from app.api.exceptions.http_exceptions import BadRequest, Unauthorized
 from app.core.security import AuthUtils
+from app.exceptions.error_messages import HTTPErrorMessage
+from app.exceptions.http_exceptions import BadRequest, Unauthorized
+from app.repositories.interfaces import IUserRepository
 from app.services.auth import AuthService
-from app.services.user import UserService
+from app.services.drops import DropService
+from app.services.users import UserService
 from main import app
 
 
@@ -78,10 +80,15 @@ def mock_service_change_password(mocker):
     return mocker.patch.object(AuthService, 'change_password', AsyncMock())
 
 
-@pytest_asyncio.fixture
-async def override_get_current_user(test_app, fake_user):
+@pytest.fixture(name='mock_service_create_drop')
+def mock_service_create_drop(mocker):
+    return mocker.patch.object(DropService, 'create_drop', AsyncMock())
 
-    test_app.dependency_overrides[get_current_user] = lambda: fake_user
+
+@pytest_asyncio.fixture
+async def override_get_current_user(test_app, fake_user_with_meta):
+
+    test_app.dependency_overrides[get_current_user] = lambda: fake_user_with_meta
     yield
     test_app.dependency_overrides.clear()
 
@@ -106,7 +113,24 @@ def fake_token_data(fake_uuid) -> str:
 
 
 @pytest.fixture
+def fake_drop_data_request(faker) -> str:
+    return {
+        'title': faker.sentence(nb_words=3),
+        'description': faker.text(max_nb_chars=200),
+        'file_url': faker.url(),
+        'cover_url': faker.url(),
+    }
+
+
+@pytest.fixture
 def fake_user_data_request(fake_user_data):
     fake_user_data['created_at'] = fake_user_data['created_at'].isoformat()
     fake_user_data['updated_at'] = fake_user_data['updated_at'].isoformat()
     return fake_user_data
+
+
+@pytest.fixture(name='mock_user_repo')
+def mock_user_repo():
+    repo = AsyncMock(spec=IUserRepository)
+    repo.get_user_by_id = AsyncMock(return_value=None)
+    return repo

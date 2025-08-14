@@ -1,4 +1,4 @@
-from app.api.exceptions.user_exceptions import BaseUserException
+from app.exceptions.user_exceptions import BaseUserException
 
 
 class BaseAuthException(Exception):

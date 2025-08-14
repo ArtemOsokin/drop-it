@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette import status
 
-from app.api.exceptions.error_messages import BaseErrorMessage, HTTPErrorMessage
+from app.exceptions.error_messages import BaseErrorMessage, HTTPErrorMessage
 
 
 class BaseApiException(Exception):  # pragma: no cover
@@ -62,32 +62,9 @@ class InternalServerError(BaseApiException):  # pragma: no cover
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
 
+class ServiceUnavailableError(BaseApiException):  # pragma: no cover
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+
+
 class AccessForbidden(BaseApiException):
     status_code = status.HTTP_403_FORBIDDEN
-
-
-async def handle_exception_response(
-    request: Request,
-    exc: BaseApiException,
-):  # pylint: disable=unused-argument  # pragma: no cover
-    return exc.get_response_data()
-
-
-async def handle_validation_error_handler(
-    request: Request,
-    exc: RequestValidationError,
-):  # pylint: disable=unused-argument  # pragma: no cover
-    param_name_index = -1
-    all_errors = exc.errors()
-    verbose_errors = ', '.join(
-        [param_name for param_name in error['loc'] if isinstance(param_name, str)][param_name_index]
-        + ' '
-        + error['msg']
-        for error in all_errors
-    )
-    error = BadRequest(
-        enum_error=HTTPErrorMessage.INCORRECT_DATA,
-        verbose_errors=verbose_errors,
-    ).get_response_data()
-
-    return error

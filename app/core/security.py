@@ -6,9 +6,9 @@ from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.api.exceptions.error_messages import HTTPErrorMessage
-from app.api.exceptions.http_exceptions import Unauthorized
 from app.core.config import settings
+from app.exceptions.error_messages import HTTPErrorMessage
+from app.exceptions.http_exceptions import Unauthorized
 from app.schemas.auth import TokenData
 
 # Настройки безопасности

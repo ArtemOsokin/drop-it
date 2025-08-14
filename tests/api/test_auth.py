@@ -1,8 +1,9 @@
+# pylint: disable=unused-argument
 import pytest
 from fastapi import status
 
-from app.api.exceptions import auth_exceptions
-from app.api.exceptions.error_messages import AuthErrorMessage, HTTPErrorMessage
+from app.exceptions import auth_exceptions
+from app.exceptions.error_messages import AuthErrorMessage, HTTPErrorMessage
 
 pytestmark = pytest.mark.asyncio
 

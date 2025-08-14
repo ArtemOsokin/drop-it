@@ -1,22 +1,23 @@
+# pylint: disable=unused-argument,too-many-positional-arguments
 import pytest
 from fastapi import status
 
-from app.api.exceptions import user_exceptions
-from app.api.exceptions.error_messages import UserErrorMessage
-from app.schemas.users import UserResponse
+from app.exceptions import user_exceptions
+from app.exceptions.error_messages import UserErrorMessage
+from app.schemas.users import UserRead
 
 pytestmark = pytest.mark.asyncio
 
 
-async def test_get_user_success(client, fake_user, mock_service_get_user_by_id):
-    mock_service_get_user_by_id.return_value = fake_user
-    response = await client.get(f'v1/users/{str(fake_user.id)}')
+async def test_get_user_success(client, fake_user_with_meta, mock_service_get_user_by_id):
+    mock_service_get_user_by_id.return_value = fake_user_with_meta
+    response = await client.get(f'v1/users/{str(fake_user_with_meta.id)}')
     assert response.status_code == status.HTTP_200_OK
 
-    user_response = UserResponse.model_validate(response.json())
+    user_response = UserRead.model_validate(response.json())
 
-    assert user_response.id == fake_user.id
-    assert user_response.username == fake_user.username
+    assert user_response.id == fake_user_with_meta.id
+    assert user_response.username == fake_user_with_meta.username
 
 
 async def test_get_user_not_found(client, fake_uuid, mock_service_get_user_by_id):

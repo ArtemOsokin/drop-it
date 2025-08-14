@@ -1,12 +1,14 @@
-from app.api.exceptions import auth_exceptions
 from app.core.security import AuthUtils
 from app.db.models.user import User
+from app.exceptions import auth_exceptions
+from app.repositories.interfaces import IUserRepository
 from app.schemas import auth as auth_model
 from app.schemas import users as users_model
-from app.services.base import BaseServiceUserRepo
 
 
-class AuthService(BaseServiceUserRepo):
+class AuthService:
+    def __init__(self, user_repo: IUserRepository) -> None:
+        self.user_repo = user_repo
 
     @staticmethod
     def _create_tokens(user_id: str) -> dict:
@@ -27,7 +29,7 @@ class AuthService(BaseServiceUserRepo):
 
         user = User(**user_data.model_dump())
         created_user = await self.user_repo.save_user(user)
-        return self._create_tokens(str(created_user))
+        return self._create_tokens(user_id=str(created_user.id))
 
     async def login(self, login_data: auth_model.UserLogin) -> dict:
         user = await self.user_repo.get_user_by_username(username=login_data.username)

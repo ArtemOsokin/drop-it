@@ -24,6 +24,10 @@ class HTTPErrorMessage(BaseErrorMessage):
         ERROR_CODE: 'user_unauthorized',
         ERROR_MESSAGE: 'Пользователь не авторизован.',
     }
+    DB_UNAVAILABLE = {
+        ERROR_CODE: 'service_unavailable',
+        ERROR_MESSAGE: 'Сервис недоступен.',
+    }
 
 
 class UserErrorMessage(BaseErrorMessage):
@@ -60,4 +64,11 @@ class AuthErrorMessage(BaseErrorMessage):
     INCORRECT_USERNAME = {
         ERROR_CODE: 'username_incorrect',
         ERROR_MESSAGE: 'Неправильно введенный логин',
+    }
+
+
+class DropErrorMessage(BaseErrorMessage):
+    GENRE_NOT_FOUND = {
+        ERROR_CODE: 'genre_not_found',
+        ERROR_MESSAGE: 'Жанр отсутствует',
     }
