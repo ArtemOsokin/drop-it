@@ -2,11 +2,11 @@ from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.exceptions.error_messages import HTTPErrorMessage
-from app.api.exceptions.http_exceptions import Unauthorized
 from app.core.security import AuthUtils, security
 from app.db.engine import get_async_session
 from app.db.models.user import User
+from app.exceptions.error_messages import HTTPErrorMessage
+from app.exceptions.http_exceptions import Unauthorized
 from app.repositories.interfaces import IUserRepository
 from app.repositories.users import UserRepository
 

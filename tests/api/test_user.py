@@ -2,8 +2,8 @@
 import pytest
 from fastapi import status
 
-from app.api.exceptions import user_exceptions
-from app.api.exceptions.error_messages import UserErrorMessage
+from app.exceptions import user_exceptions
+from app.exceptions.error_messages import UserErrorMessage
 from app.schemas.users import UserRead
 
 pytestmark = pytest.mark.asyncio

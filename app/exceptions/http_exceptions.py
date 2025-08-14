@@ -3,7 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette import status
 
-from app.api.exceptions.error_messages import BaseErrorMessage, HTTPErrorMessage
+from app.exceptions.error_messages import BaseErrorMessage, HTTPErrorMessage
 
 
 class BaseApiException(Exception):  # pragma: no cover

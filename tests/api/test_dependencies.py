@@ -1,8 +1,8 @@
 import pytest
 
 from app.api.dependencies.auth import get_current_user  # путь адаптируй под себя
-from app.api.exceptions.http_exceptions import Unauthorized
 from app.core.security import AuthUtils
+from app.exceptions.http_exceptions import Unauthorized
 
 pytestmark = pytest.mark.asyncio
 

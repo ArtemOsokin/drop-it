@@ -1,14 +1,15 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 
-from app.api.exceptions.http_exceptions import (
+from app.exceptions.http_exceptions import (
     BaseApiException,
     handle_exception_response,
     handle_validation_error_handler,
 )
 from app.api.routers import api_router
 from app.core.config import settings
-from app.middleware.logging import LoggingMiddleware
+from app.core.middleware.db import db_error_logger
+from app.core.middleware.logging import LoggingMiddleware
 
 
 
@@ -20,6 +21,7 @@ def create_app() -> FastAPI:
     app = FastAPI(docs_url="/")
 
     app.add_middleware(LoggingMiddleware)
+    app.middleware("http")(db_error_logger)
 
     app.add_exception_handler(RequestValidationError, handle_validation_error_handler)
     app.add_exception_handler(BaseApiException, handle_exception_response)

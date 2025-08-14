@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.services import get_drop_service
-from app.api.exceptions import drop_exceptions
-from app.api.exceptions.error_messages import DropErrorMessage
-from app.api.exceptions.http_exceptions import BadRequest
 from app.db.models import User
+from app.exceptions import drop_exceptions
+from app.exceptions.error_messages import DropErrorMessage
+from app.exceptions.http_exceptions import BadRequest
 from app.schemas import drops as drops_schemas
 from app.services.interfaces import IDropService
 

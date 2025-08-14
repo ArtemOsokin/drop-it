@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from app.api.exceptions import auth_exceptions
 from app.core.security import AuthUtils
+from app.exceptions import auth_exceptions
 
 pytestmark = pytest.mark.asyncio
 

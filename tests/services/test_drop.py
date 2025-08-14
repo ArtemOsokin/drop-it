@@ -1,6 +1,6 @@
 import pytest
 
-from app.api.exceptions import drop_exceptions
+from app.exceptions import drop_exceptions
 
 pytestmark = pytest.mark.asyncio
 

@@ -1,8 +1,11 @@
+import time
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
-import time
+
 from app.core.logger import logger
+
 
 class LoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
@@ -15,7 +18,8 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             raise
 
         process_time = (time.time() - start_time) * 1000
-        logger.info(f"{request.method} {request.url} — {response.status_code} "
-                    f"({process_time:.2f} ms)")
+        logger.info(
+            f"{request.method} {request.url} — {response.status_code} " f"({process_time:.2f} ms)"
+        )
 
         return response

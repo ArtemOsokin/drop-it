@@ -4,8 +4,8 @@ import datetime as dt
 import pytest
 from fastapi import status
 
-from app.api.exceptions import drop_exceptions
-from app.api.exceptions.error_messages import DropErrorMessage
+from app.exceptions import drop_exceptions
+from app.exceptions.error_messages import DropErrorMessage
 
 pytestmark = pytest.mark.asyncio
 

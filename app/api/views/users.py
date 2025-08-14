@@ -4,10 +4,10 @@ from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.services import get_user_service
-from app.api.exceptions import user_exceptions
-from app.api.exceptions.error_messages import UserErrorMessage
-from app.api.exceptions.http_exceptions import BadRequest
 from app.db.models.user import User
+from app.exceptions import user_exceptions
+from app.exceptions.error_messages import UserErrorMessage
+from app.exceptions.http_exceptions import BadRequest
 from app.schemas import users as schemas_user
 from app.services.interfaces import IUserService
 

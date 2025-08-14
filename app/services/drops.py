@@ -1,7 +1,7 @@
 import uuid
 
-from app.api.exceptions import drop_exceptions
 from app.db.models import Drop
+from app.exceptions import drop_exceptions
 from app.repositories.interfaces import IDropRepository
 from app.schemas.drops import DropCreate
 from app.services.interfaces import IDropService

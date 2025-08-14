@@ -7,9 +7,9 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 from app.api.dependencies.auth import get_current_user
-from app.api.exceptions.error_messages import HTTPErrorMessage
-from app.api.exceptions.http_exceptions import BadRequest, Unauthorized
 from app.core.security import AuthUtils
+from app.exceptions.error_messages import HTTPErrorMessage
+from app.exceptions.http_exceptions import BadRequest, Unauthorized
 from app.repositories.interfaces import IUserRepository
 from app.services.auth import AuthService
 from app.services.drops import DropService
@@ -86,7 +86,7 @@ def mock_service_create_drop(mocker):
 
 
 @pytest_asyncio.fixture
-async def override_get_current_user(test_app, fake_user_with_meta, fake_uuid):
+async def override_get_current_user(test_app, fake_user_with_meta):
 
     test_app.dependency_overrides[get_current_user] = lambda: fake_user_with_meta
     yield
