@@ -24,6 +24,10 @@ class HTTPErrorMessage(BaseErrorMessage):
         ERROR_CODE: 'user_unauthorized',
         ERROR_MESSAGE: 'Пользователь не авторизован.',
     }
+    DB_UNAVAILABLE = {
+        ERROR_CODE: 'service_unavailable',
+        ERROR_MESSAGE: 'Сервис недоступен.',
+    }
 
 
 class UserErrorMessage(BaseErrorMessage):

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     APP_HOST: str = "localhost"
     APP_PORT: int = 32165
 
-    ENVIRONMENT: Literal["local", "dev", "prod"] = "local"
+    ENV: Literal["local", "dev", "prod"] = "local"
 
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
