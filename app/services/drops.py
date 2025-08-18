@@ -17,3 +17,9 @@ class DropService(IDropService):
                 raise drop_exceptions.GenreNotFound
         drop = Drop(**drop_data.to_orm_dict(), artist_id=user_id)
         return await self.drop_repo.save_drop(drop)
+
+    async def get_drop_by_id(self, drop_id: uuid.UUID) -> Drop:
+        drop = await self.drop_repo.get_drop_by_id(drop_id=drop_id)
+        if not drop:
+            raise drop_exceptions.DropNotFound
+        return drop

@@ -1,3 +1,5 @@
+import uuid
+
 from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.auth import get_current_user
@@ -28,4 +30,23 @@ async def create_drop(
         drop = await drop_service.create_drop(drop_data=drop_data, user_id=current_user.id)
     except drop_exceptions.GenreNotFound as e:
         raise BadRequest(enum_error=DropErrorMessage.GENRE_NOT_FOUND) from e
+    return drops_schemas.DropOut.model_validate(drop)
+
+
+@router.get(
+    path='/{drop_id}',
+    response_model=drops_schemas.DropOut,
+    status_code=status.HTTP_200_OK,
+    summary="Get drop by id",
+    description="Get a drop and return drop details.",
+)
+async def get_drop_by_id(
+    drop_id: uuid.UUID,
+    _: User = Depends(get_current_user),
+    drop_service: IDropService = Depends(get_drop_service),
+):
+    try:
+        drop = await drop_service.get_drop_by_id(drop_id=drop_id)
+    except drop_exceptions.DropNotFound as e:
+        raise BadRequest(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
     return drops_schemas.DropOut.model_validate(drop)

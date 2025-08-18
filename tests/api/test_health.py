@@ -1,17 +1,13 @@
-# pylint: disable=unused-argument,too-many-positional-arguments
-from unittest.mock import AsyncMock
+# pylint: disable=unused-argument,too-many-positional-arguments,import-outside-toplevel
 
 import pytest
 from fastapi import status
-from httpx import AsyncClient, ASGITransport
 from sqlalchemy.exc import OperationalError
-from fastapi.testclient import TestClient
 
-from app.db.engine import engine
 from app.exceptions.error_messages import HTTPErrorMessage
-from main import app
 
 pytestmark = pytest.mark.asyncio
+
 
 @pytest.mark.usefixtures('apply_migrations')
 async def test_health(session, client):
@@ -22,9 +18,10 @@ async def test_health(session, client):
 
 
 @pytest.mark.asyncio
-async def test_health_error(client: AsyncClient, test_app):
-    from app.db.engine import get_async_session
+async def test_health_error(client, test_app):
     from unittest.mock import AsyncMock
+
+    from app.db.engine import get_async_session
 
     mock_session = AsyncMock()
     mock_session.execute.side_effect = OperationalError("mock", None, None)
