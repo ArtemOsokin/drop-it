@@ -7,7 +7,7 @@ from app.repositories.interfaces import IUserRepository
 
 class UserRepository(BaseRepository, IUserRepository):
 
-    async def get_user_by_id(self, user_id: int) -> User | None:
+    async def get_user_by_id(self, user_id: str) -> User | None:
         result = await self.db.execute(select(User).where(User.id == user_id))
         return result.scalar_one_or_none()
 

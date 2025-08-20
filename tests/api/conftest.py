@@ -85,6 +85,11 @@ def mock_service_create_drop(mocker):
     return mocker.patch.object(DropService, 'create_drop', AsyncMock())
 
 
+@pytest.fixture(name='mock_service_get_drop_by_id')
+def mock_service_get_drop_by_id(mocker):
+    return mocker.patch.object(DropService, 'get_drop_by_id', AsyncMock())
+
+
 @pytest_asyncio.fixture
 async def override_get_current_user(test_app, fake_user_with_meta):
 
@@ -134,3 +139,8 @@ def mock_user_repo():
     repo = AsyncMock(spec=IUserRepository)
     repo.get_user_by_id = AsyncMock(return_value=None)
     return repo
+
+
+@pytest.fixture(name='fake_header')
+def fake_header(fake_token_data):
+    return {"Authorization": f"Bearer {fake_token_data['access_token']}"}

@@ -72,3 +72,7 @@ class DropErrorMessage(BaseErrorMessage):
         ERROR_CODE: 'genre_not_found',
         ERROR_MESSAGE: 'Жанр отсутствует',
     }
+    DROP_NOT_FOUND = {
+        ERROR_CODE: 'drop_not_found',
+        ERROR_MESSAGE: 'Дроп не найден',
+    }

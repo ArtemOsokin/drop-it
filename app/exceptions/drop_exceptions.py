@@ -4,3 +4,7 @@ class BaseDropException(Exception):
 
 class GenreNotFound(BaseDropException):
     pass
+
+
+class DropNotFound(BaseDropException):
+    pass

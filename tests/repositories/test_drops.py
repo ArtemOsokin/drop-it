@@ -37,6 +37,17 @@ async def test_get_genre_by_id(created_genre, drop_repo):
     assert genre == created_genre
 
 
-async def test_get_user_by_id_none(fake_uuid, drop_repo):
+async def test_get_genre_by_id_none(fake_uuid, drop_repo):
     genre = await drop_repo.get_genre_by_id(fake_uuid)
     assert genre is None
+
+
+async def test_get_drop_by_id(created_drop, drop_repo):
+    drop = await drop_repo.get_drop_by_id(created_drop.id)
+    assert drop.id == created_drop.id
+    assert drop == created_drop
+
+
+async def test_get_drop_by_id_none(fake_uuid, drop_repo):
+    drop = await drop_repo.get_drop_by_id(fake_uuid)
+    assert drop is None
