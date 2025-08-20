@@ -33,12 +33,13 @@ async def test_update_me_success(
     fake_update_user_data,
     fake_token_data,
     fake_user,
+    fake_header,
     mock_service_update_user,
 ):
     mock_service_update_user.return_value = fake_user
     response = await client.patch(
         "v1/users/me",
-        headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
+        headers=fake_header,
         json=fake_update_user_data,
     )
     assert response.status_code == status.HTTP_200_OK
@@ -55,12 +56,13 @@ async def test_update_me_username_error(
     client,
     fake_update_user_data,
     fake_token_data,
+    fake_header,
     mock_service_update_user,
 ):
     mock_service_update_user.side_effect = user_exceptions.UsernameAlreadyExists
     response = await client.patch(
         "v1/users/me",
-        headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
+        headers=fake_header,
         json=fake_update_user_data,
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -72,12 +74,13 @@ async def test_update_me_email_error(
     client,
     fake_update_user_data,
     fake_token_data,
+    fake_header,
     mock_service_update_user,
 ):
     mock_service_update_user.side_effect = user_exceptions.EmailAlreadyExists
     response = await client.patch(
         "v1/users/me",
-        headers={"Authorization": f"Bearer {fake_token_data['access_token']}"},
+        headers=fake_header,
         json=fake_update_user_data,
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST

@@ -1,3 +1,4 @@
+# pylint: disable=unused-argument,too-many-positional-arguments
 import pytest
 
 from app.exceptions import drop_exceptions
@@ -23,3 +24,16 @@ async def test_create_drop_genre_not_found(fake_drop_create, drop_service, fake_
     drop_service.drop_repo.get_genre_by_id.return_value = None
     with pytest.raises(drop_exceptions.GenreNotFound):
         await drop_service.create_drop(drop_data=fake_drop_create, user_id=fake_user.id)
+
+
+async def test_get_drop_by_id_success(fake_drop, drop_service):
+    drop_service.drop_repo.get_drop_by_id.return_value = fake_drop
+    drop = await drop_service.get_drop_by_id(drop_id=fake_drop.id)
+    assert drop is not None
+    assert drop.id == fake_drop.id
+
+
+async def test_get_drop_by_id_not_found(fake_drop, drop_service):
+    drop_service.drop_repo.get_drop_by_id.return_value = None
+    with pytest.raises(drop_exceptions.DropNotFound):
+        await drop_service.get_drop_by_id(drop_id=fake_drop.id)

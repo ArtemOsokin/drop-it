@@ -3,7 +3,7 @@ from factory.base import T
 from faker import Faker
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Genre
+from app.db.models import Drop, Genre
 from app.db.models.user import User
 
 faker = Faker()
@@ -53,3 +53,22 @@ class GenreFactory(BaseFactory):
 
     name = factory.LazyAttribute(lambda _: faker.word())
     slug = factory.LazyAttribute(lambda _: faker.word())
+
+
+class DropFactory(BaseFactory):
+    class Meta:
+        model = Drop
+        abstract = False
+
+    title = factory.LazyAttribute(lambda _: faker.sentence(nb_words=3))
+    description = factory.LazyAttribute(lambda _: faker.text(max_nb_chars=300))
+    file_url = factory.LazyAttribute(lambda _: faker.file_path(extension='mp3'))
+    cover_url = factory.LazyAttribute(lambda _: faker.image_url())
+
+    is_archived = False
+    is_expired = False
+
+    expires_at = factory.LazyAttribute(lambda _: faker.future_datetime(end_date='+7d'))
+
+    artist = factory.SubFactory(UserFactory)
+    genre = factory.SubFactory(GenreFactory)

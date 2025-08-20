@@ -26,4 +26,4 @@ class DropRepository(BaseRepository, IDropRepository):
         )
         result = await self.db.execute(stmt)
 
-        return result.scalar_one()
+        return result.scalar_one_or_none()
