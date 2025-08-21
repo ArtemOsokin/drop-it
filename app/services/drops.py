@@ -2,7 +2,7 @@ import uuid
 
 from app.db.repositories.interfaces import IDropRepository
 from app.exceptions import drop_exceptions
-from app.models import Drop
+from app.models import Drop, Genre
 from app.schemas.drops import DropCreate
 from app.services.interfaces import IDropService
 
@@ -23,6 +23,9 @@ class DropService(IDropService):
         if not drop:
             raise drop_exceptions.DropNotFound
         return drop
+
+    async def list_genres(self) -> list[Genre]:
+        return await self.drop_repo.list_genres()
 
     async def list_drops(
         self, page: int, page_size: int, genre_id: str = None, artist_id: str = None

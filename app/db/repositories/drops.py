@@ -30,6 +30,10 @@ class DropRepository(BaseRepository, IDropRepository):
 
         return result.scalar_one_or_none()
 
+    async def list_genres(self) -> list[Genre]:
+        result = await self.db.execute(select(Genre))
+        return result.scalars().all()
+
     async def list_drops(
         self,
         page: int = 1,
