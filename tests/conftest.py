@@ -10,9 +10,9 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.config import settings as base_settings
-from app.db.models.base import Base
-from app.db.models.drop import Drop, Genre
-from app.db.models.user import User
+from app.models import Drop, Genre
+from app.models.base import Base
+from app.models.user import User
 from tests.factory import GenreFactory, UserFactory
 
 TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"

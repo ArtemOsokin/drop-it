@@ -8,9 +8,9 @@ from httpx import ASGITransport, AsyncClient
 
 from app.api.dependencies.auth import get_current_user
 from app.core.security import AuthUtils
+from app.db.repositories.interfaces import IUserRepository
 from app.exceptions.error_messages import HTTPErrorMessage
 from app.exceptions.http_exceptions import BadRequest, Unauthorized
-from app.repositories.interfaces import IUserRepository
 from app.services.auth import AuthService
 from app.services.drops import DropService
 from app.services.users import UserService

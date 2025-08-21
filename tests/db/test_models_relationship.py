@@ -5,8 +5,8 @@ import pytest
 from sqlalchemy.orm import Mapper, Relationship, RelationshipProperty
 from sqlalchemy.orm.decl_api import DeclarativeMeta
 
-from app.db.models.base import LAZY_TYPE
-from app.db.models.base import Base as _Base
+from app.models.base import LAZY_TYPE
+from app.models.base import Base as _Base
 from tests.db.fixture_values import BaseFixtureValues
 
 _RelationShipsType = typing.Collection[Relationship | RelationshipProperty]

@@ -4,11 +4,13 @@ from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.services import get_drop_service
-from app.db.models import User
+from app.core.config import settings
 from app.exceptions import drop_exceptions
 from app.exceptions.error_messages import DropErrorMessage
 from app.exceptions.http_exceptions import BadRequest
+from app.models import User
 from app.schemas import drops as drops_schemas
+from app.schemas.base import PaginatedResponse
 from app.services.interfaces import IDropService
 
 router = APIRouter()
@@ -50,3 +52,27 @@ async def get_drop_by_id(
     except drop_exceptions.DropNotFound as e:
         raise BadRequest(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
     return drops_schemas.DropOut.model_validate(drop)
+
+
+@router.get(
+    path='/',
+    response_model=PaginatedResponse[drops_schemas.DropOut],
+    status_code=status.HTTP_200_OK,
+    summary="Get drops",
+    description="Get paginated list drops by filters.",
+)
+async def get_drops(
+    page: int = 1,
+    page_size: int = settings.PAGINATION_DEFAULT_PAGE_SIZE,
+    genre_id: str = None,
+    artist_id: str = None,
+    _: User = Depends(get_current_user),
+    drop_service: IDropService = Depends(get_drop_service),
+):
+    drops, total = await drop_service.list_drops(
+        page=page,
+        page_size=page_size,
+        genre_id=genre_id,
+        artist_id=artist_id,
+    )
+    return PaginatedResponse(items=drops, total=total, page=page, page_size=page_size)

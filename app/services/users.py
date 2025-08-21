@@ -1,8 +1,8 @@
 import uuid
 
-from app.db.models.user import User
+from app.db.repositories.interfaces import IUserRepository
 from app.exceptions import user_exceptions
-from app.repositories.interfaces import IUserRepository
+from app.models.user import User
 from app.schemas import users as schemas_users
 
 

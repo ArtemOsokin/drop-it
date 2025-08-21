@@ -1,7 +1,7 @@
 from app.core.security import AuthUtils
-from app.db.models.user import User
+from app.db.repositories.interfaces import IUserRepository
 from app.exceptions import auth_exceptions
-from app.repositories.interfaces import IUserRepository
+from app.models.user import User
 from app.schemas import auth as auth_model
 from app.schemas import users as users_model
 

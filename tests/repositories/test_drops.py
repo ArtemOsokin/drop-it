@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.db.models import Drop
+from app.models import Drop
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.usefixtures('apply_migrations', 'clean_tables')]
 

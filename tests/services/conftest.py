@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 import pytest
 import pytest_asyncio
 
-from app.repositories.interfaces import IDropRepository, IUserRepository
+from app.db.repositories.interfaces import IDropRepository, IUserRepository
 from app.schemas.auth import PasswordChange, UserLogin
 from app.schemas.drops import DropCreate
 from app.schemas.users import UserCreate, UserUpdate

@@ -2,8 +2,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.engine import get_async_session
-from app.repositories.drops import DropRepository
-from app.repositories.users import UserRepository
+from app.db.repositories.drops import DropRepository
+from app.db.repositories.users import UserRepository
 from app.services.auth import AuthService
 from app.services.drops import DropService
 from app.services.interfaces import IAuthService, IDropService, IUserService

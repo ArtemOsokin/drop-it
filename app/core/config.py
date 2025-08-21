@@ -20,11 +20,13 @@ class Settings(BaseSettings):
 
     ENV: Literal["local", "dev", "prod"] = "local"
 
+    # Auth Settings
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     SECRET_KEY: str = "your-super-secret-key"
     ALGORITHM: str = "HS256"
 
+    # Log Settings
     LOG_LEVEL: str = 'DEBUG'
     LOG_PATH: str = 'logs/app.log'
 
@@ -35,6 +37,10 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str = 'postgres'
     POSTGRES_DB: str = 'postgres'
     POSTGRES_URI: str = 'postgresql+psycopg2://postgres:postgres@localhost:5433/postgres'
+
+    PAGINATION_DEFAULT_PAGE_SIZE: int = 50
+    PAGINATION_MAX_PAGE_SIZE: int = 100
+    PAGINATION_MIN_PAGE_SIZE: int = 1
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:  # pylint: disable=C0103

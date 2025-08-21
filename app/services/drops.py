@@ -1,8 +1,8 @@
 import uuid
 
-from app.db.models import Drop
+from app.db.repositories.interfaces import IDropRepository
 from app.exceptions import drop_exceptions
-from app.repositories.interfaces import IDropRepository
+from app.models import Drop
 from app.schemas.drops import DropCreate
 from app.services.interfaces import IDropService
 
@@ -23,3 +23,15 @@ class DropService(IDropService):
         if not drop:
             raise drop_exceptions.DropNotFound
         return drop
+
+    async def list_drops(
+        self, page: int, page_size: int, genre_id: str, artist_id: str
+    ) -> (list[Drop], int):
+        drops = await self.drop_repo.list_drops(
+            page=page,
+            page_size=page_size,
+            genre_id=genre_id,
+            artist_id=artist_id,
+        )
+        total = await self.drop_repo.count_drops()
+        return drops, total
