@@ -1,7 +1,7 @@
 import uuid
 from typing import Protocol
 
-from app.models import Drop, User
+from app.models import Drop, Genre, User
 from app.schemas import auth as schemas_auth
 from app.schemas import drops as schemas_drops
 from app.schemas import users as schemas_users
@@ -23,6 +23,7 @@ class IDropService(Protocol):
         self, drop_data: schemas_drops.DropCreate, user_id: uuid.UUID
     ) -> Drop: ...
     async def get_drop_by_id(self, drop_id: uuid.UUID) -> Drop: ...
+    async def list_genres(self) -> list[Genre]: ...
 
     async def list_drops(
         self, page: int, page_size: int, genre_id: str, artist_id: str

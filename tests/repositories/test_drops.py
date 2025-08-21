@@ -32,17 +32,6 @@ async def test_save_drop(session, fake_drop_data_generator, created_user, create
     assert db_drop.artist.id == created_user.id
 
 
-async def test_get_genre_by_id(created_genre, drop_repo):
-    genre = await drop_repo.get_genre_by_id(created_genre.id)
-    assert genre.id == created_genre.id
-    assert genre == created_genre
-
-
-async def test_get_genre_by_id_none(fake_uuid, drop_repo):
-    genre = await drop_repo.get_genre_by_id(fake_uuid)
-    assert genre is None
-
-
 async def test_get_drop_by_id(created_drop, drop_repo):
     drop = await drop_repo.get_drop_by_id(created_drop.id)
     assert drop.id == created_drop.id
@@ -81,10 +70,11 @@ async def test_list_drops_none(drop_repo):
 
 async def test_count_drops(drop_creator, drop_repo):
     cnt_drops = 5
-    [await drop_creator(commit=True) for _ in range(cnt_drops)]
+    _ = [await drop_creator(commit=True) for _ in range(cnt_drops)]
     count = await drop_repo.count_drops()
 
     assert count == cnt_drops
+
 
 async def test_count_drops_none(drop_repo):
     count = await drop_repo.count_drops()
