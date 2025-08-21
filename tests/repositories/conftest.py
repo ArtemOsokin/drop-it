@@ -1,10 +1,10 @@
 # pylint: disable=redefined-outer-name
 import pytest_asyncio
 
-from app.db.models.user import User
-from app.repositories.drops import DropRepository
-from app.repositories.interfaces import IDropRepository, IUserRepository
-from app.repositories.users import UserRepository
+from app.db.repositories.drops import DropRepository
+from app.db.repositories.interfaces import IDropRepository, IUserRepository
+from app.db.repositories.users import UserRepository
+from app.models.user import User
 from tests.factory import DropFactory, GenreFactory, UserFactory
 
 

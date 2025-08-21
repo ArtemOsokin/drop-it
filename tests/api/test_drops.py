@@ -6,6 +6,7 @@ from fastapi import status
 
 from app.exceptions import drop_exceptions
 from app.exceptions.error_messages import DropErrorMessage
+from app.schemas.base import PaginatedResponse
 from app.schemas.drops import DropOut
 
 pytestmark = pytest.mark.asyncio
@@ -89,3 +90,34 @@ async def test_get_drop_not_found(
     response = await client.get(f'v1/drops/{str(fake_drop.id)}', headers=fake_header)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert response.json()['error'] == DropErrorMessage.DROP_NOT_FOUND
+
+
+async def test_get_drops_success(
+    client, fake_drop, fake_header, mock_service_list_drops, override_get_current_user
+):
+    cnt_drops = 5
+    fake_drops = [fake_drop for _ in range(cnt_drops)]
+    fake_drops_ids = [d.id for d in fake_drops]
+    mock_service_list_drops.return_value = (fake_drops, cnt_drops)
+    response = await client.get(f'v1/drops/', headers=fake_header)
+    assert response.status_code == status.HTTP_200_OK
+
+    drops_response = PaginatedResponse[DropOut].model_validate(response.json())
+    assert len(drops_response.items) == cnt_drops
+    assert drops_response.total == cnt_drops
+
+    for drop in drops_response.items:
+        assert drop.id in fake_drops_ids
+
+
+async def test_get_drops_none(
+    client, fake_drop, fake_header, mock_service_list_drops, override_get_current_user
+):
+    mock_service_list_drops.return_value = ([], 0)
+    response = await client.get(f'v1/drops/', headers=fake_header)
+    assert response.status_code == status.HTTP_200_OK
+
+    drops_response = PaginatedResponse[DropOut].model_validate(response.json())
+    assert len(drops_response.items) == 0
+    assert drops_response.total == 0
+    assert not drops_response.items

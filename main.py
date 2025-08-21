@@ -17,8 +17,8 @@ from app.exceptions.handlers import (
 )
 from app.api.routers import api_router
 from app.core.config import settings
-from app.core.middleware.db import db_error_logger
-from app.core.middleware.logging import LoggingMiddleware
+from app.core.middlewares.db import db_error_logger
+from app.core.middlewares.logging import LoggingMiddleware
 
 
 @asynccontextmanager

@@ -8,7 +8,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import expression
 
-from app.db.models.base import LAZY_TYPE, IDMixin, TimestampMixin
+from app.models.base import LAZY_TYPE, IDMixin, TimestampMixin
 
 
 class Drop(IDMixin, TimestampMixin):

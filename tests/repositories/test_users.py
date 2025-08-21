@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import select
 
-from app.db.models.user import User
+from app.models.user import User
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.usefixtures('apply_migrations', 'clean_tables')]
 

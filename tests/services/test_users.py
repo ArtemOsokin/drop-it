@@ -1,8 +1,8 @@
 import pytest
 
-from app.db.models.user import User
 from app.exceptions import user_exceptions
 from app.exceptions.user_exceptions import UserNotFound
+from app.models.user import User
 
 pytestmark = pytest.mark.asyncio
 

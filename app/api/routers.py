@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
-from .routes.auth import router as auth_router
-from .routes.drops import router as drops_router
-from .routes.health_check import router as health_router
-from .routes.users import router as users_router
+from .v1.auth import router as auth_router
+from .v1.drops import router as drops_router
+from .v1.health_check import router as health_router
+from .v1.users import router as users_router
 
 v1_router = APIRouter(prefix="/v1")
 v1_router.include_router(users_router, prefix="/users", tags=["users"])

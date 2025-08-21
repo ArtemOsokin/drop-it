@@ -1,8 +1,8 @@
 from sqlalchemy import select
 
-from app.db.models.user import User
-from app.repositories.base import BaseRepository
-from app.repositories.interfaces import IUserRepository
+from app.db.repositories.base import BaseRepository
+from app.db.repositories.interfaces import IUserRepository
+from app.models.user import User
 
 
 class UserRepository(BaseRepository, IUserRepository):

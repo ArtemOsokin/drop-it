@@ -1,7 +1,7 @@
 from typing import Protocol
 
-from app.db.models import Drop, Genre
-from app.db.models.user import User
+from app.models import Drop, Genre
+from app.models.user import User
 
 
 class IUserRepository(Protocol):
@@ -16,3 +16,8 @@ class IDropRepository(Protocol):
     async def save_drop(self, drop: Drop) -> Drop: ...
     async def get_genre_by_id(self, genre_id: str) -> Genre | None: ...
     async def get_drop_by_id(self, drop_id: str) -> Drop | None: ...
+    async def count_drops(self, genre_id: str = None, artist_id: str = None) -> int: ...
+
+    async def list_drops(
+        self, page: int, page_size: int, genre_id: str = None, artist_id: str = None
+    ) -> list[Drop]: ...

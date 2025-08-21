@@ -1,4 +1,4 @@
-CODE = app/api app/core app/db migrations/env.py app/services app/repositories app/schemas tests
+CODE = app/api app/core app/db migrations/env.py app/services app/schemas tests
 TEST = pytest --verbosity=2 --strict-markers ${arg} -k "${k}" --cov-report term-missing --cov-fail-under=85
 BLACK = black --line-length 100 --target-version py313 --skip-string-normalization
 

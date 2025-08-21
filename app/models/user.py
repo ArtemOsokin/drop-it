@@ -7,7 +7,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint, 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.models.base import LAZY_TYPE, IDMixin, TimestampMixin
+from app.models.base import LAZY_TYPE, IDMixin, TimestampMixin
 
 
 class User(IDMixin, TimestampMixin):

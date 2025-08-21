@@ -8,9 +8,9 @@ from httpx import ASGITransport, AsyncClient
 
 from app.api.dependencies.auth import get_current_user
 from app.core.security import AuthUtils
+from app.db.repositories.interfaces import IUserRepository
 from app.exceptions.error_messages import HTTPErrorMessage
 from app.exceptions.http_exceptions import BadRequest, Unauthorized
-from app.repositories.interfaces import IUserRepository
 from app.services.auth import AuthService
 from app.services.drops import DropService
 from app.services.users import UserService
@@ -88,6 +88,10 @@ def mock_service_create_drop(mocker):
 @pytest.fixture(name='mock_service_get_drop_by_id')
 def mock_service_get_drop_by_id(mocker):
     return mocker.patch.object(DropService, 'get_drop_by_id', AsyncMock())
+
+@pytest.fixture(name='mock_service_list_drops')
+def mock_service_list_drops(mocker):
+    return mocker.patch.object(DropService, 'list_drops', AsyncMock())
 
 
 @pytest_asyncio.fixture

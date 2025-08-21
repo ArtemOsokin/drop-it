@@ -3,8 +3,8 @@ from factory.base import T
 from faker import Faker
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Drop, Genre
-from app.db.models.user import User
+from app.models import Drop, Genre
+from app.models.user import User
 
 faker = Faker()
 
