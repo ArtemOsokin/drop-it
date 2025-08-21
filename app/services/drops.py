@@ -25,7 +25,7 @@ class DropService(IDropService):
         return drop
 
     async def list_drops(
-        self, page: int, page_size: int, genre_id: str, artist_id: str
+        self, page: int, page_size: int, genre_id: str = None, artist_id: str = None
     ) -> (list[Drop], int):
         drops = await self.drop_repo.list_drops(
             page=page,
@@ -33,5 +33,5 @@ class DropService(IDropService):
             genre_id=genre_id,
             artist_id=artist_id,
         )
-        total = await self.drop_repo.count_drops()
+        total = await self.drop_repo.count_drops(genre_id=genre_id, artist_id=artist_id)
         return drops, total

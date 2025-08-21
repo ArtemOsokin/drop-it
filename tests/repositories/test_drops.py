@@ -2,6 +2,7 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.models import Drop
 
 pytestmark = [pytest.mark.asyncio, pytest.mark.usefixtures('apply_migrations', 'clean_tables')]
@@ -51,3 +52,40 @@ async def test_get_drop_by_id(created_drop, drop_repo):
 async def test_get_drop_by_id_none(fake_uuid, drop_repo):
     drop = await drop_repo.get_drop_by_id(fake_uuid)
     assert drop is None
+
+
+async def test_list_drops(drop_creator, drop_repo):
+    cnt_drops = 5
+    page_size = settings.PAGINATION_DEFAULT_PAGE_SIZE
+    created_drops = [await drop_creator(commit=True) for _ in range(cnt_drops)]
+    created_ids = [d.id for d in created_drops]
+
+    drops = await drop_repo.list_drops(page=1, page_size=page_size)
+
+    assert len(drops) == cnt_drops
+    assert [d.id for d in drops] == list(reversed(created_ids))
+    assert len(drops) <= page_size
+    for drop in drops:
+        assert drop.id in created_ids
+        assert drop.created_at is not None
+        assert drop.updated_at is not None
+
+
+async def test_list_drops_none(drop_repo):
+    drops = await drop_repo.list_drops(page=1, page_size=settings.PAGINATION_DEFAULT_PAGE_SIZE)
+
+    assert len(drops) == 0
+    assert drops == []
+    assert not drops
+
+
+async def test_count_drops(drop_creator, drop_repo):
+    cnt_drops = 5
+    [await drop_creator(commit=True) for _ in range(cnt_drops)]
+    count = await drop_repo.count_drops()
+
+    assert count == cnt_drops
+
+async def test_count_drops_none(drop_repo):
+    count = await drop_repo.count_drops()
+    assert count == 0
