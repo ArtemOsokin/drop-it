@@ -1,7 +1,7 @@
 import uuid
 from typing import Protocol
 
-from app.models import Drop, User, Genre
+from app.models import Drop, Genre, User
 from app.schemas import auth as schemas_auth
 from app.schemas import drops as schemas_drops
 from app.schemas import users as schemas_users

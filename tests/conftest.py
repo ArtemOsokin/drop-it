@@ -163,8 +163,8 @@ def fake_genre_data(faker):
 
 
 @pytest_asyncio.fixture
-async def fake_genre() -> Genre:
-    return await GenreFactory.create()
+async def fake_genre(fake_uuid) -> Genre:
+    return await GenreFactory.create(id=fake_uuid)
 
 
 @pytest.fixture

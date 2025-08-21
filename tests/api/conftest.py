@@ -89,9 +89,15 @@ def mock_service_create_drop(mocker):
 def mock_service_get_drop_by_id(mocker):
     return mocker.patch.object(DropService, 'get_drop_by_id', AsyncMock())
 
+
 @pytest.fixture(name='mock_service_list_drops')
 def mock_service_list_drops(mocker):
     return mocker.patch.object(DropService, 'list_drops', AsyncMock())
+
+
+@pytest.fixture(name='mock_service_list_genres')
+def mock_service_list_genres(mocker):
+    return mocker.patch.object(DropService, 'list_genres', AsyncMock())
 
 
 @pytest_asyncio.fixture

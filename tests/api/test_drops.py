@@ -99,7 +99,7 @@ async def test_get_drops_success(
     fake_drops = [fake_drop for _ in range(cnt_drops)]
     fake_drops_ids = [d.id for d in fake_drops]
     mock_service_list_drops.return_value = (fake_drops, cnt_drops)
-    response = await client.get(f'v1/drops/', headers=fake_header)
+    response = await client.get('v1/drops/', headers=fake_header)
     assert response.status_code == status.HTTP_200_OK
 
     drops_response = PaginatedResponse[DropOut].model_validate(response.json())
@@ -111,10 +111,10 @@ async def test_get_drops_success(
 
 
 async def test_get_drops_none(
-    client, fake_drop, fake_header, mock_service_list_drops, override_get_current_user
+    client, fake_header, mock_service_list_drops, override_get_current_user
 ):
     mock_service_list_drops.return_value = ([], 0)
-    response = await client.get(f'v1/drops/', headers=fake_header)
+    response = await client.get('v1/drops/', headers=fake_header)
     assert response.status_code == status.HTTP_200_OK
 
     drops_response = PaginatedResponse[DropOut].model_validate(response.json())

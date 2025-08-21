@@ -34,7 +34,6 @@ async def test_health_error(client, test_app):
     response = await client.get("/v1/health-check/healthz")
 
     assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE
-    print(response.json())
     assert response.json() == HTTPErrorMessage.DB_UNAVAILABLE
 
     test_app.dependency_overrides.clear()

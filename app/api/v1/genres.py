@@ -4,13 +4,12 @@ from fastapi import APIRouter, Depends, status
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.services import get_drop_service
-from app.core.config import settings
 from app.models import User
 from app.schemas import drops as drops_schemas
-from app.schemas.base import PaginatedResponse
 from app.services.interfaces import IDropService
 
 router = APIRouter()
+
 
 @router.get(
     path='/',
@@ -24,5 +23,5 @@ async def get_genres(
     drop_service: IDropService = Depends(get_drop_service),
 ):
     genres = await drop_service.list_genres()
-    print(genres)
+
     return [drops_schemas.GenreOut.model_validate(genre) for genre in genres]
