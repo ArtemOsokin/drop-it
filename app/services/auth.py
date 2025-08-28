@@ -1,3 +1,5 @@
+import datetime as dt
+
 from app.core.security import AuthUtils
 from app.db.repositories.interfaces import IUserRepository
 from app.exceptions import auth_exceptions
@@ -38,7 +40,8 @@ class AuthService:
 
         if not AuthUtils.verify_password(login_data.password, user.hashed_password):
             raise auth_exceptions.IncorrectPassword
-
+        user.last_login = dt.datetime.now()
+        await self.user_repo.save_user(user)
         return self._create_tokens(user_id=str(user.id))
 
     async def login_admin(self, username: str, password: str) -> User:
