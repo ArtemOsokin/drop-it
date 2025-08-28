@@ -5,6 +5,7 @@ from app.exceptions import user_exceptions
 from app.models.user import User
 from app.schemas import users as schemas_users
 from app.services.interfaces import IUserService
+from app.utils.patch import apply_schema
 
 
 class UserService(IUserService):
@@ -22,6 +23,5 @@ class UserService(IUserService):
             raise user_exceptions.EmailAlreadyExists
         if await self.user_repo.get_user_by_username(username=user_data.username):
             raise user_exceptions.UsernameAlreadyExists
-        for field, value in user_data.model_dump(exclude_unset=True).items():
-            setattr(user, field, value)
+        apply_schema(model=user, schema=user_data)
         return await self.user_repo.save_user(user=user)

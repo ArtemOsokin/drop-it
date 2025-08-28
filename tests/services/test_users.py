@@ -37,7 +37,7 @@ async def test_update_user_success(
         is_artist=fake_user_update.is_artist,
     )
 
-    user = await user_service.update_user(update_data=fake_user_update, user=fake_user)
+    user = await user_service.update_user(user_data=fake_user_update, user=fake_user)
     assert user is not None
     assert user.username == fake_user.username
     assert user.email == fake_user_update.email
@@ -55,7 +55,7 @@ async def test_update_user_username_error(
     user_service.user_repo.get_user_by_email.return_value = None
     user_service.user_repo.get_user_by_username.return_value = fake_user
     with pytest.raises(user_exceptions.UsernameAlreadyExists):
-        await user_service.update_user(update_data=fake_user_update, user=fake_user)
+        await user_service.update_user(user_data=fake_user_update, user=fake_user)
 
 
 async def test_update_user_email_error(
@@ -66,4 +66,4 @@ async def test_update_user_email_error(
     user_service.user_repo.get_user_by_email.return_value = fake_user
     user_service.user_repo.get_user_by_username.return_value = None
     with pytest.raises(user_exceptions.EmailAlreadyExists):
-        await user_service.update_user(update_data=fake_user_update, user=fake_user)
+        await user_service.update_user(user_data=fake_user_update, user=fake_user)
