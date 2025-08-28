@@ -1,4 +1,4 @@
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,R0801
 import pytest
 from fastapi import status
 

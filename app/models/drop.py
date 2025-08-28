@@ -43,6 +43,8 @@ class Drop(IDMixin, TimestampMixin):
         "Like", back_populates="drop", cascade="all, delete-orphan", lazy=LAZY_TYPE
     )
 
+    def __repr__(self) -> str:
+        return f"<Drop {self.title} - artist_id = {self.artist_id}>"
 
 class Genre(IDMixin, TimestampMixin):
     __tablename__ = "genres"
@@ -51,3 +53,6 @@ class Genre(IDMixin, TimestampMixin):
     slug: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
 
     drops: Mapped["Drop"] = relationship("Drop", back_populates="genre", lazy=LAZY_TYPE)
+
+    def __repr__(self) -> str:
+        return f"<Genre {self.slug}>"

@@ -7,6 +7,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, String, UniqueConstraint, 
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.security import AuthUtils
 from app.models.base import LAZY_TYPE, IDMixin, TimestampMixin
 
 
@@ -43,6 +44,9 @@ class User(IDMixin, TimestampMixin):
         passive_deletes=True,
         lazy=LAZY_TYPE,
     )
+
+    def __repr__(self) -> str:
+        return f"<User {self.username}>"
 
 
 class Like(IDMixin):

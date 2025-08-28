@@ -3,9 +3,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from sqladmin import Admin
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError, IntegrityError
 
+from app.admin.auth import authentication_backend
+from app.admin.views import UserAdmin, DropAdmin, GenreAdmin
 from app.core.logger import logger
 from app.db.engine import engine
 from app.exceptions.handlers import (
@@ -55,6 +58,11 @@ def create_app() -> FastAPI:
     app.add_exception_handler(BaseApiException, handle_exception_response)
     app.add_exception_handler(OperationalError, operational_error_handler)
     app.add_exception_handler(IntegrityError, integrity_error_handler)
+
+    admin = Admin(app=app, engine=engine, authentication_backend=authentication_backend)
+    admin.add_view(UserAdmin)
+    admin.add_view(DropAdmin)
+    admin.add_view(GenreAdmin)
 
     # Роуты
     app.include_router(api_router)

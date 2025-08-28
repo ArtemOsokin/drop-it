@@ -14,7 +14,9 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
         abstract = True
 
     @classmethod
-    async def create(cls, session: AsyncSession = None, commit: bool = False, **kwargs) -> T:
+    async def create(  # pylint: disable=W0236
+        cls, session: AsyncSession = None, commit: bool = False, **kwargs
+    ) -> T:
         obj = cls.build(**kwargs)
         if session:
             session.add(obj)

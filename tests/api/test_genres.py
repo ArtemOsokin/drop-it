@@ -7,7 +7,11 @@ pytestmark = pytest.mark.asyncio
 
 
 async def test_get_genres_success(
-    client, fake_genre, fake_header, mock_service_list_genres, override_get_current_user
+    client,
+    fake_genre,
+    fake_header,
+    mock_service_list_genres,
+    override_get_current_user,  # pylint: disable=unused-argument
 ):
     cnt_genres = 5
     fake_genres = [fake_genre for _ in range(cnt_genres)]
@@ -24,7 +28,10 @@ async def test_get_genres_success(
 
 
 async def test_get_genres_none(
-    client, fake_header, mock_service_list_genres, override_get_current_user
+    client,
+    fake_header,
+    mock_service_list_genres,
+    override_get_current_user,  # pylint: disable=unused-argument
 ):
     mock_service_list_genres.return_value = []
     response = await client.get('v1/genres/', headers=fake_header)

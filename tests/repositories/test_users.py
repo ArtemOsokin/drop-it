@@ -24,6 +24,14 @@ async def test_get_user_by_username(created_user, user_repo):
     assert user == created_user
 
 
+async def test_get_admin_by_username(created_user, user_repo):
+    created_user.is_admin = True
+    user = await user_repo.get_admin_by_username(created_user.username)
+    assert user.username == created_user.username
+    assert user.id == created_user.id
+    assert user == created_user
+
+
 async def test_get_user_by_username_none(faker, user_repo):
     user = await user_repo.get_user_by_username(faker.user_name())  # Добавлен await!
     assert user is None
