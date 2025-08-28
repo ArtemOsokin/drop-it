@@ -57,7 +57,7 @@ class DropRepository(BaseRepository, IDropRepository):
 
     async def count_drops(self, genre_id: str = None, artist_id: str = None) -> int:
         query = (
-            DropQueryBuilder(select(func.count()).select_from(Drop))
+            DropQueryBuilder(select(func.count()).select_from(Drop))  # pylint: disable=E1102
             .filter_by_genre(genre_id)
             .filter_by_artist(artist_id)
             .build()

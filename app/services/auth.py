@@ -41,6 +41,16 @@ class AuthService:
 
         return self._create_tokens(user_id=str(user.id))
 
+    async def login_admin(self, username: str, password: str) -> User:
+        user = await self.user_repo.get_admin_by_username(username=username)
+        if not user:
+            raise auth_exceptions.IncorrectUsername
+
+        if not AuthUtils.verify_password(password, user.hashed_password):
+            raise auth_exceptions.IncorrectPassword
+
+        return user
+
     async def change_password(self, pass_data: auth_model.PasswordChange, user: User) -> None:
         if not AuthUtils.verify_password(pass_data.current_password, user.hashed_password):
             raise auth_exceptions.IncorrectPassword

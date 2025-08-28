@@ -1,4 +1,4 @@
-# pylint: disable=unused-argument,too-many-positional-arguments
+# pylint: disable=unused-argument,too-many-positional-arguments,R0801
 import pytest
 from fastapi import status
 

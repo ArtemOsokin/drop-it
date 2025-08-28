@@ -81,6 +81,52 @@ async def test_login_incorrect_password_error(auth_service, fake_user_login, fak
     )
 
 
+async def test_login_admin_success(auth_service, fake_user_login, fake_user):
+    fake_user.is_admin = True
+    fake_user.username = fake_user_login.username
+    fake_user.hashed_password = AuthUtils.get_password_hash(fake_user_login.password)
+
+    auth_service.user_repo.get_admin_by_username.return_value = fake_user
+    user = await auth_service.login_admin(
+        username=fake_user_login.username, password=fake_user_login.password
+    )
+    auth_service.user_repo.get_admin_by_username.assert_awaited_once_with(
+        username=fake_user_login.username
+    )
+    assert user is not None
+    assert user.username == fake_user.username
+    assert user.is_admin
+    assert user.email == fake_user.email
+
+
+async def test_login_admin_incorrect_username_error(auth_service, fake_user_login):
+    auth_service.user_repo.get_admin_by_username.return_value = None
+    with pytest.raises(auth_exceptions.IncorrectUsername):
+        await auth_service.login_admin(
+            username=fake_user_login.username, password=fake_user_login.password
+        )
+    auth_service.user_repo.get_admin_by_username.assert_awaited_once_with(
+        username=fake_user_login.username
+    )
+
+
+async def test_login_incorrect_admin_password_error(
+    auth_service, fake_user_login, fake_user, faker
+):
+    fake_user.username = fake_user_login.username
+    fake_user.hashed_password = AuthUtils.get_password_hash(fake_user_login.password)
+
+    auth_service.user_repo.get_admin_by_username.return_value = fake_user
+    fake_user_login.password = faker.password()
+    with pytest.raises(auth_exceptions.IncorrectPassword):
+        await auth_service.login_admin(
+            username=fake_user_login.username, password=fake_user_login.password
+        )
+    auth_service.user_repo.get_admin_by_username.assert_awaited_once_with(
+        username=fake_user_login.username
+    )
+
+
 async def test_change_password_success(auth_service, fake_change_password, fake_user):
     fake_user.hashed_password = AuthUtils.get_password_hash(fake_change_password.current_password)
     auth_service.user_repo.save_user.return_value = fake_user
