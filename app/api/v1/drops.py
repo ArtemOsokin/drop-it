@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, status
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.services import get_drop_service
 from app.core.config import settings
-from app.exceptions import drop_exceptions
-from app.exceptions.error_messages import DropErrorMessage
+from app.exceptions import auth_exceptions, drop_exceptions
+from app.exceptions.error_messages import AuthErrorMessage, DropErrorMessage
 from app.exceptions.http_exceptions import BadRequest
 from app.models import User
 from app.schemas import drops as drops_schemas
@@ -76,3 +76,25 @@ async def get_drops(
         artist_id=artist_id,
     )
     return PaginatedResponse(items=drops, total=total, page=page, page_size=page_size)
+
+
+@router.patch(
+    '/{drop_id}',
+    response_model=drops_schemas.DropOut,
+    status_code=status.HTTP_200_OK,
+    summary="Update Drop",
+    description="Update data for drop by id.",
+)
+async def update_drop(
+    drop_id: uuid.UUID,
+    update_data: drops_schemas.DropUpdate,
+    user: User = Depends(get_current_user),
+    drop_service: IDropService = Depends(get_drop_service),
+):
+    try:
+        drop = await drop_service.update_drop(drop_data=update_data, drop_id=drop_id, user=user)
+    except auth_exceptions.PermissionDenied as e:
+        raise BadRequest(enum_error=AuthErrorMessage.PERMISSION_DENIED) from e
+    except drop_exceptions.DropNotFound as e:
+        raise BadRequest(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
+    return drops_schemas.DropOut.model_validate(drop)

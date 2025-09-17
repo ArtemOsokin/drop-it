@@ -6,9 +6,10 @@ from app.exceptions import auth_exceptions
 from app.models.user import User
 from app.schemas import auth as auth_model
 from app.schemas import users as users_model
+from app.services.interfaces import IAuthService
 
 
-class AuthService:
+class AuthService(IAuthService):
     def __init__(self, user_repo: IUserRepository) -> None:
         self.user_repo = user_repo
 

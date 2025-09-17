@@ -2,7 +2,7 @@ import datetime as dt
 import uuid
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, HttpUrl, constr
+from pydantic import AnyUrl, BaseModel, ConfigDict, HttpUrl, constr
 
 
 # ---------- Genre ----------
@@ -47,17 +47,15 @@ class DropCreate(DropBase):
         return d
 
 
-# class DropUpdate(BaseModel):
-#     title: Optional[constr(max_length=255)] = None
-#     description: Optional[str] = None
-#     file_url: Optional[HttpUrl] = None
-#     cover_url: Optional[HttpUrl] = None
-#     genre_id: Optional[uuid.UUID] = None
-#     is_archived: Optional[bool] = None
-#     is_expired: Optional[bool] = None
-#     expires_at: Optional[dt.datetime] = None
-#
-#
+class DropUpdate(BaseModel):
+    title: Optional[constr(max_length=255)] = None
+    description: Optional[str] = None
+    file_url: Optional[AnyUrl] = None
+    cover_url: Optional[HttpUrl] = None
+    genre_id: Optional[uuid.UUID] = None
+    is_archived: Optional[bool] = None
+
+
 # class DropRead(DropBase):
 #     model_config = ConfigDict(from_attributes=True)
 #

@@ -6,7 +6,7 @@ import pytest_asyncio
 
 from app.db.repositories.interfaces import IDropRepository, IUserRepository
 from app.schemas.auth import PasswordChange, UserLogin
-from app.schemas.drops import DropCreate
+from app.schemas.drops import DropCreate, DropUpdate
 from app.schemas.users import UserCreate, UserUpdate
 from app.services.auth import AuthService
 from app.services.drops import DropService
@@ -21,6 +21,11 @@ def fake_user_create(fake_user_data):
 @pytest.fixture
 def fake_user_update(fake_user_data):
     return UserUpdate(**fake_user_data)
+
+
+@pytest.fixture
+def fake_drop_update(fake_drop_data):
+    return DropUpdate(**fake_drop_data)
 
 
 @pytest.fixture

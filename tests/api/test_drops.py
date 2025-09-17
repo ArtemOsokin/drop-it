@@ -4,8 +4,8 @@ import datetime as dt
 import pytest
 from fastapi import status
 
-from app.exceptions import drop_exceptions
-from app.exceptions.error_messages import DropErrorMessage
+from app.exceptions import auth_exceptions, drop_exceptions
+from app.exceptions.error_messages import AuthErrorMessage, DropErrorMessage
 from app.schemas.base import PaginatedResponse
 from app.schemas.drops import DropOut
 
@@ -121,3 +121,64 @@ async def test_get_drops_none(
     assert len(drops_response.items) == 0
     assert drops_response.total == 0
     assert not drops_response.items
+
+
+async def test_update_drop_success(
+    override_get_current_user,
+    client,
+    fake_drop_update_data,
+    fake_drop,
+    fake_header,
+    mock_service_update_drop,
+):
+    mock_service_update_drop.return_value = fake_drop
+    response = await client.patch(
+        f"v1/drops/{fake_drop.id}",
+        headers=fake_header,
+        json=fake_drop_update_data,
+    )
+    assert response.status_code == status.HTTP_200_OK
+
+    drop = response.json()
+    assert drop is not None
+    assert drop['id'] is not None
+    assert drop['title'] == fake_drop.title
+    assert drop['description'] == fake_drop.description
+    assert drop['file_url'] == fake_drop.file_url
+    assert drop['genre']['id'] == str(fake_drop.genre_id)
+
+
+async def test_update_drop_permission_error(
+    override_get_current_user,
+    client,
+    fake_drop_update_data,
+    fake_drop,
+    fake_header,
+    mock_service_update_drop,
+):
+    mock_service_update_drop.side_effect = auth_exceptions.PermissionDenied
+    response = await client.patch(
+        f"v1/drops/{fake_drop.id}",
+        headers=fake_header,
+        json=fake_drop_update_data,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()['error'] == AuthErrorMessage.PERMISSION_DENIED
+
+
+async def test_update_drop_not_found_error(
+    override_get_current_user,
+    client,
+    fake_drop_update_data,
+    fake_drop,
+    fake_header,
+    mock_service_update_drop,
+):
+    mock_service_update_drop.side_effect = drop_exceptions.DropNotFound
+    response = await client.patch(
+        f"v1/drops/{fake_drop.id}",
+        headers=fake_header,
+        json=fake_drop_update_data,
+    )
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.json()['error'] == DropErrorMessage.DROP_NOT_FOUND

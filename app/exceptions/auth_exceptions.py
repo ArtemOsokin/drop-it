@@ -1,21 +1,21 @@
-from app.exceptions.user_exceptions import BaseUserException
-
-
 class BaseAuthException(Exception):
     pass
 
 
-class UserAlreadyExistsEmail(BaseUserException):
+class UserAlreadyExistsEmail(BaseAuthException):
     pass
 
 
-class UserAlreadyExistsUsername(BaseUserException):
+class UserAlreadyExistsUsername(BaseAuthException):
     pass
 
 
-class IncorrectPassword(BaseUserException):
+class IncorrectPassword(BaseAuthException):
     pass
 
 
-class IncorrectUsername(BaseUserException):
+class IncorrectUsername(BaseAuthException):
+    pass
+
+class PermissionDenied(BaseAuthException):
     pass

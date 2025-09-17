@@ -1,17 +1,20 @@
 import uuid
 
 from app.db.repositories.interfaces import IDropRepository
-from app.exceptions import drop_exceptions
-from app.models import Drop, Genre
-from app.schemas.drops import DropCreate
+from app.exceptions import auth_exceptions, drop_exceptions
+from app.models import Drop, Genre, User
+from app.schemas import drops as drops_schemas
 from app.services.interfaces import IDropService
+from app.utils.patch import apply_schema
 
 
 class DropService(IDropService):
     def __init__(self, drop_repo: IDropRepository) -> None:
         self.drop_repo = drop_repo
 
-    async def create_drop(self, drop_data: DropCreate, user_id: uuid.UUID) -> Drop:
+    ALLOWED_FIELDS = {"title", "description", "genre_id", "file_url", "cover_url", "is_archived"}
+
+    async def create_drop(self, drop_data: drops_schemas.DropCreate, user_id: uuid.UUID) -> Drop:
         if drop_data.genre_id:
             if not await self.drop_repo.get_genre_by_id(drop_data.genre_id):
                 raise drop_exceptions.GenreNotFound
@@ -38,3 +41,17 @@ class DropService(IDropService):
         )
         total = await self.drop_repo.count_drops(genre_id=genre_id, artist_id=artist_id)
         return drops, total
+
+    async def update_drop(
+        self, drop_data: drops_schemas.DropUpdate, drop_id: uuid.UUID, user: User
+    ) -> Drop:
+        drop = await self.drop_repo.get_drop_by_id(drop_id=drop_id)
+
+        if not drop:
+            raise drop_exceptions.DropNotFound
+        if drop.artist_id != user.id and not user.is_admin:
+            raise auth_exceptions.PermissionDenied
+
+        apply_schema(drop, drop_data, allowed_fields=self.ALLOWED_FIELDS)
+
+        return await self.drop_repo.save_drop(drop)
