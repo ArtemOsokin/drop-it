@@ -13,7 +13,7 @@ from app.core.config import settings as base_settings
 from app.models import Drop, Genre
 from app.models.base import Base
 from app.models.user import User
-from tests.factory import GenreFactory, UserFactory
+from tests.factory import DropFactory, GenreFactory, UserFactory
 
 TEST_DB_NAME_PREFIX = f"_test_{uuid.uuid4().hex[:8]}"
 TEST_DB_NAME = f"{base_settings.POSTGRES_DB+TEST_DB_NAME_PREFIX}"
@@ -139,6 +139,24 @@ def fake_user_data(faker, fake_update_user_data):
 
 
 @pytest_asyncio.fixture
+async def fake_drop_data():
+    drop = await DropFactory.create()
+    return {k: v for k, v in drop.__dict__.items() if not k.startswith("_")}
+
+
+@pytest_asyncio.fixture
+async def fake_drop_update_data(faker, fake_uuid):
+    return {
+        'title': faker.sentence(nb_words=3),
+        'description': faker.text(max_nb_chars=300),
+        'file_url': f'{faker.url()}{faker.file_path(extension='mp3')}',
+        'cover_url': faker.image_url(),
+        'genre_id': str(fake_uuid),
+        'is_archived': False,
+    }
+
+
+@pytest_asyncio.fixture
 async def fake_user() -> User:
     return await UserFactory.create()
 
@@ -194,7 +212,7 @@ def fake_drop(fake_drop_data_generator, fake_user, fake_genre) -> Drop:
     """Создает экземпляр Genre"""
     data = fake_drop_data_generator(artist_id=fake_user.id, genre_id=fake_genre.id)
     data["id"] = uuid.uuid4()
-    return Drop(**data)
+    return Drop(**data, artist=fake_user, genre=fake_genre)
 
 
 @pytest.fixture

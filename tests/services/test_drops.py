@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from app.core.config import settings
-from app.exceptions import drop_exceptions
+from app.exceptions import auth_exceptions, drop_exceptions
 
 pytestmark = pytest.mark.asyncio
 
@@ -63,3 +63,49 @@ async def test_list_drops_none(drop_service):
     assert len(drops) == 0
     assert total == 0
     assert not drops
+
+
+async def test_update_drop_success(
+    fake_drop,
+    fake_drop_update,
+    drop_service,
+):
+    drop_service.drop_repo.get_drop_by_id.return_value = fake_drop
+    drop_service.drop_repo.save_drop.return_value = fake_drop
+    drop = await drop_service.update_drop(
+        drop_data=fake_drop_update, drop_id=fake_drop.id, user=fake_drop.artist
+    )
+
+    assert drop is not None
+    assert drop.title == fake_drop_update.title
+    assert drop.description == fake_drop_update.description
+    assert drop.cover_url == str(fake_drop_update.cover_url)
+    assert drop.file_url == str(fake_drop_update.file_url)
+
+
+async def test_update_user_drop_not_found_error(
+    fake_drop,
+    fake_drop_update,
+    drop_service,
+):
+    drop_service.drop_repo.get_drop_by_id.return_value = None
+    with pytest.raises(drop_exceptions.DropNotFound):
+        await drop_service.update_drop(
+            drop_data=fake_drop_update, drop_id=fake_drop.id, user=fake_drop.artist
+        )
+
+
+async def test_update_user_permission_denied_error(
+    fake_uuid,
+    fake_drop,
+    fake_user,
+    fake_drop_update,
+    drop_service,
+):
+    drop_service.drop_repo.get_drop_by_id.return_value = fake_drop
+    fake_user.is_admin = False
+    fake_user.id = fake_uuid
+    with pytest.raises(auth_exceptions.PermissionDenied):
+        await drop_service.update_drop(
+            drop_data=fake_drop_update, drop_id=fake_drop.id, user=fake_user
+        )

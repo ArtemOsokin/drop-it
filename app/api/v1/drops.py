@@ -95,4 +95,6 @@ async def update_drop(
         drop = await drop_service.update_drop(drop_data=update_data, drop_id=drop_id, user=user)
     except auth_exceptions.PermissionDenied as e:
         raise BadRequest(enum_error=AuthErrorMessage.PERMISSION_DENIED) from e
+    except drop_exceptions.DropNotFound as e:
+        raise BadRequest(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
     return drops_schemas.DropOut.model_validate(drop)

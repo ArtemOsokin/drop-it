@@ -64,7 +64,7 @@ class DropFactory(BaseFactory):
 
     title = factory.LazyAttribute(lambda _: faker.sentence(nb_words=3))
     description = factory.LazyAttribute(lambda _: faker.text(max_nb_chars=300))
-    file_url = factory.LazyAttribute(lambda _: faker.file_path(extension='mp3'))
+    file_url = factory.LazyAttribute(lambda _: f'{faker.url()}{faker.file_path(extension='mp3')}')
     cover_url = factory.LazyAttribute(lambda _: faker.image_url())
 
     is_archived = False

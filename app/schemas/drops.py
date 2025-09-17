@@ -2,7 +2,7 @@ import datetime as dt
 import uuid
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, HttpUrl, constr
+from pydantic import AnyUrl, BaseModel, ConfigDict, HttpUrl, constr
 
 
 # ---------- Genre ----------
@@ -50,7 +50,7 @@ class DropCreate(DropBase):
 class DropUpdate(BaseModel):
     title: Optional[constr(max_length=255)] = None
     description: Optional[str] = None
-    file_url: Optional[HttpUrl] = None
+    file_url: Optional[AnyUrl] = None
     cover_url: Optional[HttpUrl] = None
     genre_id: Optional[uuid.UUID] = None
     is_archived: Optional[bool] = None
