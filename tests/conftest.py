@@ -221,3 +221,17 @@ def fake_login_data(fake_user_data):
         'username': fake_user_data['username'],
         'password': fake_user_data['password'],
     }
+
+
+@pytest_asyncio.fixture
+async def drop_creator(session):
+    async def _factory(commit: bool = False, **kwargs):
+        drop = await DropFactory.create(session=session, commit=commit, **kwargs)
+        return drop
+
+    return _factory
+
+
+@pytest_asyncio.fixture
+async def created_drop(drop_creator) -> Drop:
+    return await drop_creator(commit=True)

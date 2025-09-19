@@ -182,3 +182,40 @@ async def test_update_drop_not_found_error(
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['error'] == DropErrorMessage.DROP_NOT_FOUND
+
+
+async def test_delete_drop_success(
+    override_get_current_user,
+    client,
+    fake_uuid,
+    fake_header,
+    mock_service_delete_drop,
+):
+    response = await client.delete(f"v1/drops/{fake_uuid}", headers=fake_header)
+    assert response.status_code == status.HTTP_204_NO_CONTENT
+
+
+async def test_delete_drop_not_found_error(
+    override_get_current_user,
+    client,
+    fake_uuid,
+    fake_header,
+    mock_service_delete_drop,
+):
+    mock_service_delete_drop.side_effect = drop_exceptions.DropNotFound
+    response = await client.delete(f"v1/drops/{fake_uuid}", headers=fake_header)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()['error'] == DropErrorMessage.DROP_NOT_FOUND
+
+
+async def test_delete_permission_error(
+    override_get_current_user,
+    client,
+    fake_uuid,
+    fake_header,
+    mock_service_delete_drop,
+):
+    mock_service_delete_drop.side_effect = auth_exceptions.PermissionDenied
+    response = await client.delete(f"v1/drops/{fake_uuid}", headers=fake_header)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+    assert response.json()['error'] == AuthErrorMessage.PERMISSION_DENIED

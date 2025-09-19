@@ -5,7 +5,7 @@ from app.db.repositories.drops import DropRepository
 from app.db.repositories.interfaces import IDropRepository, IUserRepository
 from app.db.repositories.users import UserRepository
 from app.models.user import User
-from tests.factory import DropFactory, GenreFactory, UserFactory
+from tests.factory import GenreFactory, UserFactory
 
 
 @pytest_asyncio.fixture
@@ -34,20 +34,6 @@ async def genre_creator(session):
 @pytest_asyncio.fixture
 async def created_genre(genre_creator) -> User:
     return await genre_creator(commit=True)
-
-
-@pytest_asyncio.fixture
-async def drop_creator(session):
-    async def _factory(commit: bool = False, **kwargs):
-        drop = await DropFactory.create(session=session, commit=commit, **kwargs)
-        return drop
-
-    return _factory
-
-
-@pytest_asyncio.fixture
-async def created_drop(drop_creator) -> User:
-    return await drop_creator(commit=True)
 
 
 @pytest_asyncio.fixture
