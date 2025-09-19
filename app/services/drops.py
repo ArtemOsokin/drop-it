@@ -1,3 +1,4 @@
+import datetime as dt
 import uuid
 
 from app.db.repositories.interfaces import IDropRepository
@@ -55,3 +56,13 @@ class DropService(IDropService):
         apply_schema(drop, drop_data, allowed_fields=self.ALLOWED_FIELDS)
 
         return await self.drop_repo.save_drop(drop)
+
+    async def delete_drop(self, drop_id: uuid.UUID, user: User) -> None:
+        drop = await self.drop_repo.get_drop_by_id(drop_id=drop_id)
+        if not drop:
+            raise drop_exceptions.DropNotFound
+        if drop.artist_id != user.id and not user.is_admin:
+            raise auth_exceptions.PermissionDenied
+        drop.is_deleted = True
+        drop.deleted_at = dt.datetime.now(dt.timezone.utc)
+        await self.drop_repo.save_drop(drop)

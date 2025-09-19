@@ -26,7 +26,7 @@ class User(IDMixin, TimestampMixin):
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_admin: Mapped[bool] = mapped_column(Boolean, default=False)
-    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=True)
 
     last_login: Mapped[dt.datetime | None] = mapped_column(DateTime, nullable=True)
 

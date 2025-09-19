@@ -2,9 +2,11 @@
 from unittest.mock import AsyncMock
 
 import pytest
+from sqlalchemy import select
 
 from app.core.config import settings
 from app.exceptions import auth_exceptions, drop_exceptions
+from app.models import Drop
 
 pytestmark = pytest.mark.asyncio
 
@@ -109,3 +111,29 @@ async def test_update_user_permission_denied_error(
         await drop_service.update_drop(
             drop_data=fake_drop_update, drop_id=fake_drop.id, user=fake_user
         )
+
+
+@pytest.mark.usefixtures('apply_migrations')
+async def test_delete_drop(session, created_drop, drop_service):
+    drop_service.drop_repo.get_drop_by_id.return_value = created_drop
+    assert created_drop.is_deleted is False
+    await drop_service.delete_drop(drop_id=created_drop.id, user=created_drop.artist)
+    result = await session.execute(select(Drop).where(Drop.id == created_drop.id))
+    db_drop: Drop | None = result.scalar_one_or_none()
+    assert db_drop.id == created_drop.id
+    assert db_drop.is_deleted is True
+
+    assert db_drop.deleted_at is not None
+
+
+async def test_delete_drop_not_found_error(fake_drop, drop_service):
+    drop_service.drop_repo.get_drop_by_id.return_value = None
+    with pytest.raises(drop_exceptions.DropNotFound):
+        await drop_service.delete_drop(drop_id=fake_drop.id, user=fake_drop.artist)
+
+
+async def test_delete_drop_permission_denied_error(fake_drop, fake_user, fake_uuid, drop_service):
+    fake_user.id = fake_uuid
+    drop_service.drop_repo.get_drop_by_id.return_value = fake_drop
+    with pytest.raises(auth_exceptions.PermissionDenied):
+        await drop_service.delete_drop(drop_id=fake_drop.id, user=fake_user)

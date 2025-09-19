@@ -69,6 +69,7 @@ class DropFactory(BaseFactory):
 
     is_archived = False
     is_expired = False
+    is_deleted = False
 
     expires_at = factory.LazyAttribute(lambda _: faker.future_datetime(end_date='+7d'))
 

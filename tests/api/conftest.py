@@ -100,6 +100,11 @@ def mock_service_update_drop(mocker):
     return mocker.patch.object(DropService, 'update_drop', AsyncMock())
 
 
+@pytest.fixture(name='mock_service_delete_drop')
+def mock_service_delete_drop(mocker):
+    return mocker.patch.object(DropService, 'delete_drop', AsyncMock())
+
+
 @pytest.fixture(name='mock_service_list_genres')
 def mock_service_list_genres(mocker):
     return mocker.patch.object(DropService, 'list_genres', AsyncMock())
