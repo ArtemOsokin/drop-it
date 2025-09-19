@@ -7,7 +7,7 @@ from app.api.dependencies.services import get_drop_service
 from app.core.config import settings
 from app.exceptions import auth_exceptions, drop_exceptions
 from app.exceptions.error_messages import AuthErrorMessage, DropErrorMessage
-from app.exceptions.http_exceptions import BadRequest
+from app.exceptions.http_exceptions import AccessForbidden, NotFound
 from app.models import User
 from app.schemas import drops as drops_schemas
 from app.schemas.base import PaginatedResponse
@@ -31,7 +31,7 @@ async def create_drop(
     try:
         drop = await drop_service.create_drop(drop_data=drop_data, user_id=current_user.id)
     except drop_exceptions.GenreNotFound as e:
-        raise BadRequest(enum_error=DropErrorMessage.GENRE_NOT_FOUND) from e
+        raise NotFound(enum_error=DropErrorMessage.GENRE_NOT_FOUND) from e
     return drops_schemas.DropOut.model_validate(drop)
 
 
@@ -50,7 +50,7 @@ async def get_drop_by_id(
     try:
         drop = await drop_service.get_drop_by_id(drop_id=drop_id)
     except drop_exceptions.DropNotFound as e:
-        raise BadRequest(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
+        raise NotFound(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
     return drops_schemas.DropOut.model_validate(drop)
 
 
@@ -94,7 +94,27 @@ async def update_drop(
     try:
         drop = await drop_service.update_drop(drop_data=update_data, drop_id=drop_id, user=user)
     except auth_exceptions.PermissionDenied as e:
-        raise BadRequest(enum_error=AuthErrorMessage.PERMISSION_DENIED) from e
+        raise AccessForbidden(enum_error=AuthErrorMessage.PERMISSION_DENIED) from e
     except drop_exceptions.DropNotFound as e:
-        raise BadRequest(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
+        raise NotFound(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
     return drops_schemas.DropOut.model_validate(drop)
+
+
+@router.delete(
+    '/{drop_id}',
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete Drop",
+    description="Delete drop by id.",
+)
+async def delete_drop(
+    drop_id: uuid.UUID,
+    user: User = Depends(get_current_user),
+    drop_service: IDropService = Depends(get_drop_service),
+):
+    try:
+        await drop_service.delete_drop(drop_id=drop_id, user=user)
+    except auth_exceptions.PermissionDenied as e:
+        raise AccessForbidden(enum_error=AuthErrorMessage.PERMISSION_DENIED) from e
+    except drop_exceptions.DropNotFound as e:
+        raise NotFound(enum_error=DropErrorMessage.DROP_NOT_FOUND) from e
+    return status.HTTP_204_NO_CONTENT

@@ -66,7 +66,7 @@ async def test_create_drop_genre_not_found(
     mock_service_create_drop.side_effect = drop_exceptions.GenreNotFound
     response = await client.post("v1/drops/", json=fake_drop_data_request)
 
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['error'] == DropErrorMessage.GENRE_NOT_FOUND
 
 
@@ -88,7 +88,7 @@ async def test_get_drop_not_found(
 ):
     mock_service_get_drop_by_id.side_effect = drop_exceptions.DropNotFound
     response = await client.get(f'v1/drops/{str(fake_drop.id)}', headers=fake_header)
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['error'] == DropErrorMessage.DROP_NOT_FOUND
 
 
@@ -162,7 +162,7 @@ async def test_update_drop_permission_error(
         headers=fake_header,
         json=fake_drop_update_data,
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_403_FORBIDDEN
     assert response.json()['error'] == AuthErrorMessage.PERMISSION_DENIED
 
 
@@ -180,5 +180,5 @@ async def test_update_drop_not_found_error(
         headers=fake_header,
         json=fake_drop_update_data,
     )
-    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json()['error'] == DropErrorMessage.DROP_NOT_FOUND

@@ -27,6 +27,7 @@ class Drop(IDMixin, TimestampMixin):
 
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_expired: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     artist: Mapped["User"] = relationship(
         "User", back_populates="drops", lazy=LAZY_TYPE, passive_deletes=True
@@ -37,6 +38,10 @@ class Drop(IDMixin, TimestampMixin):
         DateTime(timezone=True),
         nullable=False,
         server_default=expression.text("(now() + interval '7 days')"),
+    )
+    deleted_at: Mapped[dt.datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True
     )
 
     likes: Mapped[List["Like"]] = relationship(

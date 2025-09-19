@@ -8,7 +8,7 @@ class DropQueryBuilder:
     def __init__(self, base_query: Select | None = None):
         if base_query is None:
             base_query = select(Drop)
-        self.query = base_query.where(Drop.is_archived.is_(False))
+        self.query = base_query.where(Drop.is_archived.is_(False), Drop.is_deleted.is_(False))
 
     def filter_by_genre(self, genre_id: str | None):
         if genre_id:

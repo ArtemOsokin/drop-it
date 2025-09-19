@@ -13,8 +13,8 @@ router = APIRouter()
 @router.get("/healthz", summary="Health check endpoint")
 async def health_check(response: Response, session: AsyncSession = Depends(get_async_session)):
     """
-    Проверяет доступность базы данных.
-    Возвращает 200 если БД доступна, иначе 503.
+    Checks database availability.
+    Returns 200 if DB is available, otherwise 503.
     """
     try:
         await session.execute(text("SELECT 1"))
