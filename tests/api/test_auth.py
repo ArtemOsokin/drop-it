@@ -9,18 +9,21 @@ pytestmark = pytest.mark.asyncio
 
 
 async def test_signup_success(
-    client, fake_user_data_request, mock_service_register, fake_token_data
+    client, fake_user_data_request, mock_service_register, fake_token_data, fake_user_with_meta
 ):
-    mock_service_register.return_value = fake_token_data
+    mock_service_register.return_value = fake_user_with_meta, fake_token_data
     response = await client.post("v1/auth/signup", json=fake_user_data_request)
 
     assert response.status_code == status.HTTP_201_CREATED
 
-    tokens = response.json()
-    assert tokens is not None
-    assert "access_token" in tokens
-    assert "refresh_token" in tokens
-    assert tokens['token_type'] == 'bearer'
+    user_signup_response = response.json()
+    assert user_signup_response is not None
+    assert "access_token" in user_signup_response
+    assert "refresh_token" in user_signup_response
+    assert user_signup_response['token_type'] == 'bearer'
+    assert user_signup_response['user']['id'] == str(fake_user_with_meta.id)
+    assert user_signup_response['user']['email'] == fake_user_with_meta.email
+    assert user_signup_response['user']['username'] == fake_user_with_meta.username
 
 
 async def test_signup_username_error(client, fake_user_data_request, mock_service_register):

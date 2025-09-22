@@ -16,11 +16,14 @@ async def test_register_success(
     auth_service.user_repo.get_user_by_email.return_value = None
     auth_service.user_repo.get_user_by_username.return_value = None
     auth_service.user_repo.save_user.return_value = fake_user
-    tokens = await auth_service.register(user_data=fake_user_create)
+    user, tokens = await auth_service.register(user_data=fake_user_create)
     tokens = json.dumps(tokens)
     assert tokens is not None
     assert "access_token" in tokens
     assert "refresh_token" in tokens
+    assert user.id == fake_user.id
+    assert user.email == fake_user.email
+    assert user.username == fake_user.username
 
 
 async def test_register_username_error(

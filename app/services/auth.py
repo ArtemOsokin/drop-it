@@ -32,7 +32,9 @@ class AuthService(IAuthService):
 
         user = User(**user_data.model_dump())
         created_user = await self.user_repo.save_user(user)
-        return self._create_tokens(user_id=str(created_user.id))
+        tokens = self._create_tokens(user_id=str(created_user.id))
+
+        return created_user, tokens
 
     async def login(self, login_data: auth_model.UserLogin) -> dict:
         user = await self.user_repo.get_user_by_username(username=login_data.username)
