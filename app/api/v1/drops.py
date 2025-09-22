@@ -44,7 +44,7 @@ async def create_drop(
 )
 async def get_drop_by_id(
     drop_id: uuid.UUID,
-    _: User = Depends(get_current_user),
+    # _: User = Depends(get_current_user),
     drop_service: IDropService = Depends(get_drop_service),
 ):
     try:
@@ -66,7 +66,7 @@ async def get_drops(
     page_size: int = settings.PAGINATION_DEFAULT_PAGE_SIZE,
     genre_id: str = None,
     artist_id: str = None,
-    _: User = Depends(get_current_user),
+    # _: User = Depends(get_current_user),
     drop_service: IDropService = Depends(get_drop_service),
 ):
     drops, total = await drop_service.list_drops(
