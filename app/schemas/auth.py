@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
+from app.schemas import users as users_schema
+
 
 class UserLogin(BaseModel):
     username: str
@@ -13,6 +15,13 @@ class Token(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class UserSighup(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    user: users_schema.UserRead
 
 
 class TokenData(BaseModel):
