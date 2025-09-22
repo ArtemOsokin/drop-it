@@ -33,7 +33,7 @@ class UserAdmin(ModelView, model=User):
 
 
 class DropAdmin(ModelView, model=Drop):
-    column_list = [Drop.id, Drop.title, Drop.artist_id, Drop.genre_id]
+    column_list = [Drop.id, Drop.title, Drop.artist_id, Drop.genre_id, Drop.is_deleted, Drop.is_archived]
     column_searchable_list = [Drop.title]
     column_sortable_list = [Drop.title]
     column_default_sort = [(Drop.title, True)]
