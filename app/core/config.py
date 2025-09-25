@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Set
 
 from pydantic import PostgresDsn
 from pydantic_core import MultiHostUrl
@@ -20,6 +20,12 @@ class Settings(BaseSettings):
 
     ENV: Literal["local", "dev", "prod"] = "local"
 
+    ALLOWED_AUDIO_FORMATS: Set[str] = {"mp3", "aac"}
+    ALLOWED_IMAGE_FORMATS: Set[str] = {"jpg", "png"}
+
+    MAX_DROP_SIZE: int = 20 * 1024 * 1024
+    MAX_COVER_SIZE: int = 5 * 1024 * 1024
+
     # Auth Settings
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -38,9 +44,17 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = 'postgres'
     POSTGRES_URI: str = 'postgresql+psycopg2://postgres:postgres@localhost:5433/postgres'
 
+    # Pagination settings
     PAGINATION_DEFAULT_PAGE_SIZE: int = 50
     PAGINATION_MAX_PAGE_SIZE: int = 100
     PAGINATION_MIN_PAGE_SIZE: int = 1
+
+    # S3 settings
+    S3_ENDPOINT_URL: str = "http://localhost:9000"  # для локального MinIO
+    S3_ACCESS_KEY: str = "minioadmin"
+    S3_SECRET_KEY: str = "minioadmin"
+    S3_BUCKET_NAME: str = "drops"
+    S3_REGION_NAME: str = "us-east-1"
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:  # pylint: disable=C0103

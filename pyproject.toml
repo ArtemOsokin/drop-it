@@ -21,6 +21,7 @@ bcrypt = "<4.1.0"
 loguru = {version = "^0.7.3", markers = "python_version < '4.0'"}
 sqladmin = "^0.21.0"
 itsdangerous = "^2.2.0"
+aioboto3 = "^15.1.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"

@@ -11,7 +11,7 @@ from app.exceptions.error_messages import HTTPErrorMessage
 from app.exceptions.http_exceptions import Unauthorized
 from app.schemas.auth import TokenData
 
-# Настройки безопасности
+# Security settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
@@ -19,17 +19,17 @@ security = HTTPBearer()
 class AuthUtils:
     @staticmethod
     def verify_password(plain_password: str, hashed_password: str) -> bool:
-        """Проверка пароля"""
+        """Check password"""
         return pwd_context.verify(plain_password, hashed_password)
 
     @staticmethod
     def get_password_hash(password: str) -> str:
-        """Хеширование пароля"""
+        """Hash password"""
         return pwd_context.hash(password)
 
     @staticmethod
     def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-        """Создание access токена"""
+        """Create access token"""
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now() + expires_delta
@@ -42,7 +42,7 @@ class AuthUtils:
 
     @staticmethod
     def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-        """Создание refresh токена"""
+        """Create refresh token"""
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now() + expires_delta
@@ -55,7 +55,7 @@ class AuthUtils:
 
     @staticmethod
     def verify_token(token: str, token_type: str = "access") -> TokenData:
-        """Верификация токена"""
+        """Token verification"""
 
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
